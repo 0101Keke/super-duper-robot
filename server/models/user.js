@@ -1,19 +1,18 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
         unique: true,
-        trim: true
+        maxlength: 50
     },
 
     email: {
         type: String,
         required: true,
-        unique: true,
-        lowercase: true
+        unique: true
     },
 
     passwordHash: {
@@ -21,39 +20,34 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
 
-    emailConfirmed: {
-        type: Boolean,
-        default: false
-    },
-
     userType: {
         type: String,
         enum: ['Student', 'Tutor', 'Admin'],
         required: true
-    },
-
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
+},
+
+    {
+    timestamps: true
 });
 
-// Hash password before saving
-UserSchema.pre('save', async function (next) {
+//Hashing password before saving
+userSchema.pre('save', async function (next) {
     if (!this.isModified('passwordHash')) return next();
-
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
+    const salt = await bcrypt.genSalt(10);
+    this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+    next();
 });
 
-// Compare password method
-UserSchema.methods.comparePassword = async function(password) {
-    return await bcrypt.compare(password, this.passwordHash);
+//Method Skeletons
+userSchema.methods.register = function (username, email, password) {
 };
 
-module.exports = mongoose.model('User', UserSchema);
+userSchema.methods.login = function (email, password) {
+    return false;
+};
+
+userSchema.methods.logout = function () {
+};
+
+module.exports = mongoose.model('User', userSchema);
