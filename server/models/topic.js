@@ -1,39 +1,39 @@
+// models/Topic.js
 const mongoose = require('mongoose');
-
-// Enum for TopicStatus
-const TopicStatus = {
-    OPEN: 'OPEN',
-    RESOLVED: 'RESOLVED'
-};
 
 const topicSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 200
     },
+
     description: {
-        type: String
+        type: String,
+        maxlength: 1000
     },
-    createdDate: {
-        type: Date,
-        default: Date.now,
+
+    courseID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
         required: true
     },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+
     status: {
         type: String,
-        enum: Object.values(TopicStatus),
-        default: TopicStatus.OPEN,
-        required: true
+        enum: ['open', 'closed', 'archived'],
+        default: 'open'
     },
-    studentId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
-        required: true
-    },
-    moduleId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Module',
-        required: true
+
+    isPinned: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
@@ -50,6 +50,9 @@ topicSchema.methods.addResource = async function (file) {
 
 topicSchema.methods.closeTopic = async function () {
 };
+
+topicSchema.index({ courseID: 1, createdAt: -1 });
+
 
 // Export the enum for use in other files
 topicSchema.statics.TopicStatus = TopicStatus;
