@@ -1,20 +1,30 @@
-import React from 'react';
-import Register from './pages/Register';
+import { Routes, Route } from 'react-router-dom';
+import PrivateRoute from './components/PrivateRoute';
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
-import Topics from './pages/Topics';
-import UploadResource from './pages/UploadResource';
+import Register from './pages/Register';
+import Home from './pages/Home';
 
-export default function App() {
-  return (
-    <div style={{ padding:20 }}>
-      <h1>CampusLearn (demo)</h1>
-      <Register />
-      <hr/>
-      <Login />
-      <hr/>
-      <Topics />
-      <hr/>
-      <UploadResource />
-    </div>
-  );
+function App() {
+    return (
+        <div className="App">
+            <Navbar />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <PrivateRoute>
+                            <Dashboard />
+                        </PrivateRoute>
+                    }
+                />
+            </Routes>
+        </div>
+    );
 }
+
+export default App;
