@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/campuslearn', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/CampusLearn');
         console.log('MongoDB Connected');
     } catch (err) {
         console.error('MongoDB connection error:', err);
