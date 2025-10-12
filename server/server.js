@@ -26,6 +26,9 @@ app.use('/api', router);
 
 // Health check
 app.get('/api/v1/ping', (req, res) => res.json({ pong: true }));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/topics', require('./routes/topics'));
+app.use('/api/resources', require('./routes/resources'));
 
 // Error handling middleware
 app.use(errorHandler);
