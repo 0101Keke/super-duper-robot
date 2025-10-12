@@ -8,35 +8,30 @@ const userSchema = new mongoose.Schema({
         unique: true,
         maxlength: 50
     },
-
     email: {
         type: String,
         required: true,
         unique: true
     },
-
     passwordHash: {
         type: String,
         required: true
     },
-
     userType: {
         type: String,
         enum: ['Student', 'Tutor', 'Admin'],
         required: true
-    }
-},
-  status: {
+    },
+    status: {  
         type: String,
         enum: ['active', 'banned', 'suspended'],
         default: 'active'
-    },
-
-    {
+    }
+}, {
     timestamps: true
 });
 
-//Hashing password before saving
+// Hashing password before saving
 userSchema.pre('save', async function (next) {
     if (!this.isModified('passwordHash')) return next();
     const salt = await bcrypt.genSalt(10);
@@ -44,15 +39,9 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-//Method Skeletons
-userSchema.methods.register = function (username, email, password) {
-};
-
-userSchema.methods.login = function (email, password) {
-    return false;
-};
-
-userSchema.methods.logout = function () {
+// Method to compare password
+userSchema.methods.comparePassword = async function(password) {
+    return await bcrypt.compare(password, this.passwordHash);
 };
 
 module.exports = mongoose.model('User', userSchema);
