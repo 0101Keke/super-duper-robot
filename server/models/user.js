@@ -43,6 +43,11 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
+userSchema.methods.checkPassword = function (password) {
+  return bcrypt.compare(password, this.passwordHash)
+    .then((result) => result);
+};
+
 //Method Skeletons
 userSchema.methods.register = function (username, email, password) {
 };

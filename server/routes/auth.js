@@ -2,12 +2,18 @@ const express = require('express');
 const router = express.Router();
 
 // Example login route
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  if (email === 'test@example.com' && password === '12345') {
-    return res.status(200).json({ message: 'Login successful', token: 'mock-token-123' });
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !user.checkPassword(password)) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ message: 'Login successful', token });
+  } catch (err) {
+    return res.status(500).json({ message: 'Internal server error' });
   }
-  return res.status(401).json({ message: 'Invalid credentials' });
 });
 
 // Example register route
