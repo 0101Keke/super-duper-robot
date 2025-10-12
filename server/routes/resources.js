@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const resources = require('../controllers/resourcesController');
-const { authMiddleware } = require('../middleware/auth');
 
-router.get('/', authMiddleware, resources.getResources);
-router.post('/upload', authMiddleware, resources.uploadResource);
+// Placeholder routes
+router.get('/', (req, res) => {
+    res.json({ message: 'Get all resources' });
+});
+
+router.post('/', (req, res) => {
+    res.json({ message: 'Upload resource' });
+});
 
 module.exports = router;

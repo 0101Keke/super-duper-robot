@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const topics = require('../controllers/topicsController');
-const { authMiddleware, authorizeRoles } = require('../middleware/auth');
 
-router.get('/', authMiddleware, topics.getTopics);
-router.post('/', authMiddleware, topics.createTopic);
-router.post('/:id/subscribe', authMiddleware, topics.subscribe);
-router.post('/:id/resolve', authMiddleware, authorizeRoles('tutor','admin'), topics.markResolved);
+// Placeholder routes
+router.get('/', (req, res) => {
+    res.json({ message: 'Get all topics' });
+});
+
+router.post('/', (req, res) => {
+    res.json({ message: 'Create topic' });
+});
 
 module.exports = router;

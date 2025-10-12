@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/topics', require('./routes/topicRoutes'));
-app.use('/api/resources', require('./routes/resourceRoutes'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/topics', require('./routes/topics'));
+app.use('/api/resources', require('./routes/resources'));
 
 // Error handling middleware
 app.use(require('./middleware/errorHandler'));
