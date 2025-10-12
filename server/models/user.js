@@ -24,15 +24,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Student', 'Tutor', 'Admin'],
         required: true
-    }
-},
+    },
   status: {
         type: String,
         enum: ['active', 'banned', 'suspended'],
         default: 'active'
     },
 
-    {
+    
     timestamps: true
 });
 

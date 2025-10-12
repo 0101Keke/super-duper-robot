@@ -24,7 +24,7 @@ app.use('/api/topics', require('./routes/topicRoutes'));
 app.use('/api/resources', require('./routes/resourceRoutes'));
 
 // Error handling middleware
-app.use(require('./middleware/errorHandler'));
+app.use(require('./server/middleware/errorHandler'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
