@@ -79,7 +79,7 @@ const isAdmin = (req, res, next) => {
 //Middleware attaches full user object from database
 const attachUser = async (req, res, next) => {
     try {
-        const User = require('../models/User');
+        const User = require('./server/models/User');
         const user = await User.findById(req.userId).select('-passwordHash');
 
         if (!user) {

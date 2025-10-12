@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const resources = require('../controllers/resourcesController');
-const { authMiddleware } = require('../middleware/auth');
 
-router.get('/', authMiddleware, resources.getResources);
-router.post('/upload', authMiddleware, resources.uploadResource);
+// GET resources
+router.get('/', (req, res) => {
+  res.json([
+    { id: 1, name: 'CampusLearn Guide', url: 'https://campuslearn.edu/resources/guide.pdf' },
+    { id: 2, name: 'Machine Learning Notes', url: 'https://campuslearn.edu/resources/ml-notes.pdf' }
+  ]);
+});
 
 module.exports = router;
