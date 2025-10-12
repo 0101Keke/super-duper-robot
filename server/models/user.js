@@ -53,7 +53,6 @@ userSchema.methods.register = function (username, email, password) {
 };
 
 userSchema.methods.login = function (email, password) {
-    return false;
 };
 
 userSchema.methods.logout = function () {

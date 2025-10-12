@@ -55,6 +55,14 @@ topicSchema.index({ courseID: 1, createdAt: -1 });
 
 
 // Export the enum for use in other files
-topicSchema.statics.TopicStatus = TopicStatus;
+const TopicStatus = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  DELETED: 'deleted'
+};
+
+// ...
+
+topicSchema.status = TopicStatus;
 
 module.exports = mongoose.model('Topic', topicSchema);
