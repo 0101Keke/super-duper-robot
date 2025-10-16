@@ -1,0 +1,17 @@
+{
+  "name": "campuslearn",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
+    "concurrently": "^7.6.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.4"
+  }
+}
