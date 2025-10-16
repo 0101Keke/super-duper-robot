@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -66,23 +65,12 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-=======
-<<<<<<< HEAD
+
 * {
     box-sizing: border-box;
-=======
-/*@import "@tailwindcss/postcss";*/
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Optional custom styles */
-body {
-  @apply bg-gray-50 text-gray-900;
->>>>>>> 8e3d7d63376bbe2462e305052997839576513f73
 }
 
 input {
     pointer-events: auto !important;
->>>>>>> f63ec98c6e0e741fb5fdbe84aa54d3c7c6ffc222
+  }
 }
