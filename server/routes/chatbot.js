@@ -30,6 +30,8 @@ router.post('/chat', async (req, res) => {
     console.error('Gemini API error:', error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to get a response from Gemini' });
   }
+  console.log("Sending to Gemini:", userMessage);
+
 });
 
 module.exports = router;

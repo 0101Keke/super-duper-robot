@@ -1,12 +1,19 @@
 export const sendMessageToChatbot = async (message) => {
-  const response = await fetch('http://localhost:5001/api/chatbot/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message }),
-  });
-  const data = await response.json();
-  return data.reply;
+  try {
+    const response = await fetch('http://localhost:5001/api/chatbot/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+
+    const data = await response.json();
+    return data.reply || "No response received from server.";
+  } catch (error) {
+    console.error("Error contacting chatbot:", error);
+    return "Error: Could not reach the chatbot server.";
+  }
 };
+;
 
 /* 
 chatbot UI component (for example Chatbot.jsx):
