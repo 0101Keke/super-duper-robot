@@ -10,5 +10,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",
     "concurrently": "^7.6.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.4"
   }
 }

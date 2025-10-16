@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const Register = () => {
-    const [name, setName] = useState('');
+const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { register } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -17,10 +16,10 @@ const Register = () => {
         setLoading(true);
 
         try {
-            await register({ name, email, password });
+            await login({ email, password });
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to register');
+            setError(err.response?.data?.message || 'Failed to login');
         } finally {
             setLoading(false);
         }
@@ -28,19 +27,9 @@ const Register = () => {
 
     return (
         <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
-            <h2>Register</h2>
+            <h2>Login</h2>
             {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
             <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        style={{ width: '100%', padding: '0.5rem', fontSize: '1rem' }}
-                    />
-                </div>
                 <div style={{ marginBottom: '1rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email:</label>
                     <input
@@ -66,14 +55,14 @@ const Register = () => {
                     disabled={loading}
                     style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', cursor: 'pointer' }}
                 >
-                    {loading ? 'Registering...' : 'Register'}
+                    {loading ? 'Logging in...' : 'Login'}
                 </button>
             </form>
             <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-                Already have an account? <Link to="/login">Login</Link>
+                Don't have an account? <Link to="/register">Register</Link>
             </p>
         </div>
     );
 };
 
-export default Register;
+export default Login;
