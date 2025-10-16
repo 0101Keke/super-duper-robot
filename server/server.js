@@ -4,7 +4,7 @@ const router = express.Router();
 const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorhandler');
-app.use('/api/chatbot', require('./routes/chatbot'));
+
 
 
 const Tutor = require('./models/Tutor');
@@ -13,6 +13,8 @@ const Topic = require('./models/topic');
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+
+app.use('/api/chatbot', require('./routes/chatbot'));
 
 // Connect to DB
 connectDB(process.env.MONGODB_URI);

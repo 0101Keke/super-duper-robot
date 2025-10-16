@@ -1,5 +1,5 @@
 export const sendMessageToChatbot = async (message) => {
-  const response = await fetch('http://localhost:5000/api/chatbot/chat', {
+  const response = await fetch('http://localhost:5001/api/chatbot/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message }),
