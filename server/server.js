@@ -5,15 +5,23 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorhandler');
 
+
+
 const Tutor = require('./models/Tutor');
-const Topic = require('./models/Topic');
+const Topic = require('./models/topic');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Vite default port
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 
+app.use('/api/chatbot', require('./routes/chatbot'));
+
 // Connect to DB
-connectDB(process.env.MONGO_URI);
+connectDB(process.env.MONGODB_URI);
+
 
 // Routes
 router.post('/tutors/:id/topics/:topicId/response', async (req, res) => {

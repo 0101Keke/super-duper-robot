@@ -57,6 +57,20 @@ userSchema.methods.comparePassword = async function(password) {
     return await bcrypt.compare(password, this.passwordHash);
 };
 
+User.prototype.findOne = async function(query) {
+  try {
+    const existingUser = await this.constructor.findOne({
+      $or: [
+        { email: query.email },
+        { username: query.username }
+      ]
+    });
+    return existingUser;
+  } catch (err) {
+    throw new Error('Error finding user');
+  }
+};
+
 module.exports = mongoose.model('User', userSchema);
 userSchema.methods.comparePassword = async function(password) {
     return await bcrypt.compare(password, this.passwordHash);

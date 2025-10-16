@@ -1,5 +1,16 @@
+<<<<<<< HEAD
 * {
     box-sizing: border-box;
+=======
+/*@import "@tailwindcss/postcss";*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional custom styles */
+body {
+  @apply bg-gray-50 text-gray-900;
+>>>>>>> 8e3d7d63376bbe2462e305052997839576513f73
 }
 
 input {
