@@ -1,11 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const topics = require('../controllers/topicsController');
-const { authMiddleware, authorizeRoles } = require('../middleware/auth');
 
-router.get('/', authMiddleware, topics.getTopics);
-router.post('/', authMiddleware, topics.createTopic);
-router.post('/:id/subscribe', authMiddleware, topics.subscribe);
-router.post('/:id/resolve', authMiddleware, authorizeRoles('tutor','admin'), topics.markResolved);
+// GET all topics
+router.get('/', (req, res) => {
+  res.json([
+    { id: 1, title: 'Web Programming', description: 'Discuss HTML, CSS, JS' },
+    { id: 2, title: 'Database Systems', description: 'Talk SQL, NoSQL' }
+  ]);
+});
+
+// POST a new topic
+router.post('/', (req, res) => {
+  const { title, description } = req.body;
+  if (!title || !description) {
+    return res.status(400).json({ message: 'Missing title or description' });
+  }
+  res.status(201).json({ message: 'Topic created successfully', topic: { title, description } });
+});
 
 module.exports = router;

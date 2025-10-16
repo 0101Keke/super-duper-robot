@@ -7,23 +7,51 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+<<<<<<< HEAD
     "preview": "vite preview"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+=======
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+>>>>>>> f63ec98c6e0e741fb5fdbe84aa54d3c7c6ffc222
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+<<<<<<< HEAD
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
+=======
+    "@testing-library/cypress": "^10.1.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "cypress": "^15.4.0",
+>>>>>>> f63ec98c6e0e741fb5fdbe84aa54d3c7c6ffc222
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
+<<<<<<< HEAD
     "vite": "^7.1.7"
+=======
+<<<<<<< HEAD
+=======
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.14",
+>>>>>>> 8e3d7d63376bbe2462e305052997839576513f73
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
+>>>>>>> f63ec98c6e0e741fb5fdbe84aa54d3c7c6ffc222
   }
 }

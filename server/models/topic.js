@@ -1,13 +1,68 @@
+// models/Topic.js
 const mongoose = require('mongoose');
 
 const topicSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  moduleCode: { type: String, required: true },
-  creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, enum: ['Open','Resolved'], default: 'Open' },
-  createdAt: { type: Date, default: Date.now },
-  subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    title: {
+        type: String,
+        required: true,
+        maxlength: 200
+    },
+
+    description: {
+        type: String,
+        maxlength: 1000
+    },
+
+    courseID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
+        required: true
+    },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+
+    status: {
+        type: String,
+        enum: ['open', 'closed', 'archived'],
+        default: 'open'
+    },
+
+    isPinned: {
+        type: Boolean,
+        default: false
+    }
+}, {
+    timestamps: true
 });
+
+//Method skeletons
+topicSchema.methods.addResponse = async function (tutorOrId, text) {
+    return null;
+};
+
+topicSchema.methods.addResource = async function (file) {
+    return null;
+};
+
+topicSchema.methods.closeTopic = async function () {
+};
+
+topicSchema.index({ courseID: 1, createdAt: -1 });
+
+
+// Export the enum for use in other files
+const TopicStatus = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  DELETED: 'deleted'
+};
+
+// ...
+
+topicSchema.status = TopicStatus;
 
 module.exports = mongoose.model('Topic', topicSchema);

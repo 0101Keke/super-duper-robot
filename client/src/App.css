@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .bg-green {
   background-color: #198754 !important; /* matches footer bg-success */
   color: white; /* ensures labels/text inside the form are readable */
@@ -32,3 +33,47 @@ form.bg-green label {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* subtle shadow */
 }
 
+=======
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+>>>>>>> f63ec98c6e0e741fb5fdbe84aa54d3c7c6ffc222
