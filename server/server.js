@@ -4,9 +4,11 @@ const router = express.Router();
 const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorhandler');
+app.use('/api/chatbot', require('./routes/chatbot'));
+
 
 const Tutor = require('./models/Tutor');
-const Topic = require('./models/Topic');
+const Topic = require('./models/topic');
 
 const app = express();
 app.use(cors());
