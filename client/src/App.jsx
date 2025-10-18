@@ -9,7 +9,7 @@ import TutorReg from './pages/TutorReg.jsx';
 import TutorLogin from './pages/TutorLogin.jsx';
 import StudentDash from './pages/StudentDash.jsx';
 import TutorDash from './pages/TutorDash.jsx';
-
+import Chatbot from './pages/Chatbot.jsx';
 
 function App() {
     return (
@@ -21,7 +21,7 @@ function App() {
             <Route path="/TutLogin" element={<TutorLogin />} />
             <Route path="/student" element={<StudentDash />} />
             <Route path="/tutor" element={<TutorDash />} />
-            
+             <Route path="/chatbot" element={<Chatbot />} />
         </Routes>
     );
 }
