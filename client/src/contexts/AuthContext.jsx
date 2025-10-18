@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                const response = await authAPI.getCurrentUser();
+                const response = await authAPI.getMe();
                 setUser(response.data);
             } catch (error) {
                 console.error('Auth check failed:', error);
@@ -35,17 +35,15 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
-            console.log('AuthContext register called with:', userData);  // Removed emoji
-
+            console.log('AuthContext register called with:', userData);
             const response = await authAPI.register(userData);
-
-            console.log('Register response:', response.data);  // Removed emoji
+            console.log('Register response:', response.data);
 
             localStorage.setItem('token', response.data.token);
             setUser(response.data.user);
             return response.data;
         } catch (error) {
-            console.error('Register failed in AuthContext:', error);  // Removed emoji
+            console.error('Register failed in AuthContext:', error);
             throw error;
         }
     };
