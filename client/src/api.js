@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL:'http://localhost:5000/api'
-,
+    baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json'
     }
@@ -24,7 +23,16 @@ API.interceptors.request.use(
 export const authAPI = {
     register: (userData) => API.post('/auth/register', userData),
     login: (credentials) => API.post('/auth/login', credentials),
-    getMe: () => API.get('/auth/me')
+    getMe: () => API.get('/auth/me'),
+    getCurrentUser: () => API.get('/auth/me') // Add this alias for AuthContext
+};
+
+// Users endpoints (for profile management)
+export const usersAPI = {
+    getProfile: () => API.get('/users/profile'),
+    updateProfile: (data) => API.put('/users/profile', data),
+    getAllStudents: () => API.get('/users/students'),
+    getAllTutors: () => API.get('/users/tutors')
 };
 
 // Topics endpoints
@@ -33,7 +41,8 @@ export const topicsAPI = {
     getById: (id) => API.get(`/topics/${id}`),
     create: (data) => API.post('/topics', data),
     update: (id, data) => API.put(`/topics/${id}`, data),
-    delete: (id) => API.delete(`/topics/${id}`)
+    delete: (id) => API.delete(`/topics/${id}`),
+    addComment: (id, comment) => API.post(`/topics/${id}/comments`, { comment })
 };
 
 // Resources endpoints
@@ -42,7 +51,22 @@ export const resourcesAPI = {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
     getByTopic: (topicId) => API.get(`/resources/topic/${topicId}`),
-    download: (id) => API.get(`/resources/download/${id}`, { responseType: 'blob' })
+    download: (id) => API.get(`/resources/download/${id}`, { responseType: 'blob' }),
+    getAll: () => API.get('/resources')
+};
+
+// Messages endpoints
+export const messagesAPI = {
+    getConversations: () => API.get('/messages/conversations'),
+    getMessages: (userId) => API.get(`/messages/${userId}`),
+    sendMessage: (recipientId, message) => API.post('/messages', { recipientId, message })
+};
+
+// Dashboard endpoints
+export const dashboardAPI = {
+    getStudentStats: () => API.get('/dashboard/student'),
+    getTutorStats: () => API.get('/dashboard/tutor'),
+    getAdminStats: () => API.get('/dashboard/admin')
 };
 
 export default API;

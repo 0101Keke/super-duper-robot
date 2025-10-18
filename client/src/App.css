@@ -1,7 +1,7 @@
-<<<<<<< HEAD
+
 .bg-green {
-  background-color: #198754 !important; /* matches footer bg-success */
-  color: white; /* ensures labels/text inside the form are readable */
+  background-color: #198754 !important; 
+  color: white; 
 }
 
 form.bg-green {
@@ -33,7 +33,7 @@ form.bg-green label {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* subtle shadow */
 }
 
-=======
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -76,4 +76,3 @@ form.bg-green label {
 .read-the-docs {
   color: #888;
 }
->>>>>>> f63ec98c6e0e741fb5fdbe84aa54d3c7c6ffc222

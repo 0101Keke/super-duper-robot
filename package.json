@@ -12,6 +12,7 @@
     "concurrently": "^7.6.0"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^5.0.4"
+    "@vitejs/plugin-react": "^5.0.4",
+    "axios": "^1.12.2"
   }
 }

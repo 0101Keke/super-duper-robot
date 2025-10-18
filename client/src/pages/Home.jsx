@@ -6,7 +6,7 @@ const Home = () => {
 
     return (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h1>Welcome to MyApp</h1>
+            <h1>Welcome to  Freedom fighters</h1>
             {user ? (
                 <div>
                     <p>You are logged in as {user.email}</p>
@@ -20,12 +20,12 @@ const Home = () => {
                 <div>
                     <p>Please log in to continue</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
-                        <Link to="/login">
+                        <Link to="/Stulogin">
                             <button style={{ padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer' }}>
                                 Login
                             </button>
                         </Link>
-                        <Link to="/register">
+                        <Link to="/StuReg">
                             <button style={{ padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer' }}>
                                 Register
                             </button>
