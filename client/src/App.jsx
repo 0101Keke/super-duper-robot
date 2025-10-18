@@ -21,7 +21,7 @@ function App() {
             <Route path="/TutLogin" element={<TutorLogin />} />
             <Route path="/student" element={<StudentDash />} />
             <Route path="/tutor" element={<TutorDash />} />
-             <Route path="/chatbot" element={<Chatbot />} />
+            <Route path="/chatbot" element={<Chatbot />} />
         </Routes>
     );
 }
