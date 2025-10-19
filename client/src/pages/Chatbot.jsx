@@ -1,152 +1,82 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import "./chatbot.css";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// 🔑 Use your Gemini API key (from Google AI Studio)
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+function Chatbot() {
+  const [userInput, setUserInput] = useState("");
+  const [messages, setMessages] = useState([]);
 
-export default function Chatbot() {
-  const [messages, setMessages] = useState([
-    {
-      from: "bot",
-      text: "Hello! I'm CampusLearn TutorBot. I can help you find a tutor, view resources, or book a session. How can I assist you today?",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const messagesEndRef = useRef(null);
+  const handleSend = async () => {
+    if (!userInput.trim()) return;
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMessage = { from: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setMessages((prev) => [...prev, { sender: "user", text: userInput }]);
+    setUserInput("");
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent(input);
-      const reply = result.response.text();
+      const response = await fetch("http://localhost:5000/api/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userInput }),
+      });
 
-      setMessages((prev) => [...prev, { from: "bot", text: reply }]);
+      const data = await response.json();
+      setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
     } catch (err) {
-      console.error("Gemini error:", err);
+      console.error("Chatbot error:", err);
       setMessages((prev) => [
         ...prev,
-        { from: "bot", text: "Sorry, something went wrong. Please try again later." },
+        { sender: "bot", text: "Sorry, something went wrong." },
       ]);
     }
   };
 
-  const handlePromptClick = (promptText) => {
-    setInput(promptText);
+  // Quick actions (like in AI Studio)
+  const handleQuickAction = (action) => {
+    setUserInput(action);
+    handleSend(action);
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
   return (
-    <div className="app-container">
-      <nav className="main-nav">
-        <div className="logo">
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ color: "white" }}
+    <div className="chatbot-container">
+      <div className="chat-header">
+        <h1>CampusLearn Assistant</h1>
+        <p>Your academic guide, ready to help you succeed!</p>
+      </div>
+
+      <div className="quick-actions">
+        <button onClick={() => handleQuickAction("Find Tutor")}>
+          🎓 Find Tutor
+        </button>
+        <button onClick={() => handleQuickAction("View Resources")}>
+          📚 View Resources
+        </button>
+        <button onClick={() => handleQuickAction("Book Session")}>
+          📅 Book Session
+        </button>
+      </div>
+
+      <div className="chat-window">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`message ${msg.sender === "user" ? "user" : "bot"}`}
           >
-            <path
-              d="M12 3L1 9L12 15L23 9L12 3Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M5 12.5L5 17.5L12 21L19 17.5V12.5"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>CampusLearn</span>
-        </div>
-
-        <div className="nav-links">
-          <a href="/" className="nav-link active">
-            Home
-          </a>
-          <a href="/student" className="nav-link">
-            Student
-          </a>
-          <a href="/tutor" className="nav-link">
-            Tutor
-          </a>
-          <a href="/admin" className="nav-link">
-            Admin
-          </a>
-        </div>
-
-        <div className="nav-actions">
-          <input type="search" placeholder="Search" className="search-bar" />
-          <div className="profile">
-            <div className="profile-icon"></div>
-            <span>Profile</span>
+            {msg.text}
           </div>
-        </div>
-      </nav>
+        ))}
+      </div>
 
-      <main className="chat-area">
-        <div id="message-container">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.from}`}>
-              <div className="content">{msg.text}</div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <div className="chat-input-section">
-          <div id="example-prompts">
-            <button className="prompt-button" onClick={() => handlePromptClick("Find Tutor")}>
-              Find Tutor
-            </button>
-            <button className="prompt-button" onClick={() => handlePromptClick("View Resources")}>
-              View Resources
-            </button>
-            <button className="prompt-button" onClick={() => handlePromptClick("Book Session")}>
-              Book Session
-            </button>
-          </div>
-
-          <form id="chat-form" onSubmit={handleSend}>
-            <input
-              type="text"
-              id="chat-input"
-              placeholder="Type your question"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              autoComplete="off"
-              required
-            />
-            <button type="submit" id="send-button" aria-label="Send message">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="20"
-                height="20"
-              >
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-              </svg>
-            </button>
-          </form>
-        </div>
-      </main>
+      <div className="chat-input">
+        <input
+          type="text"
+          value={userInput}
+          placeholder="Type your message..."
+          onChange={(e) => setUserInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        />
+        <button onClick={handleSend}>Send ➤</button>
+      </div>
     </div>
   );
 }
+
+export default Chatbot;
