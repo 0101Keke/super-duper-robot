@@ -1,7 +1,45 @@
+import { useState } from 'react';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 
 function Contact() {
+  // State for form fields
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+
+  // State for submission feedback
+  const [status, setStatus] = useState(null);
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  // Handle form submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.message) {
+      setStatus({ type: 'error', text: 'Please fill out all fields.' });
+      return;
+    }
+
+    // Simulate async message send (like API call)
+    setStatus({ type: 'loading', text: 'Sending your message...' });
+
+    setTimeout(() => {
+      setStatus({ type: 'success', text: 'Message sent successfully!' });
+      setFormData({ name: '', email: '', message: '' }); // clear form
+    }, 1500);
+  };
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
@@ -14,7 +52,23 @@ function Contact() {
           <div className="col-md-6">
             <div className="bg-light-green p-4 rounded shadow-sm">
               <h4 className="mb-3">Send us a message</h4>
-              <form>
+
+              {/* Feedback message */}
+              {status && (
+                <div
+                  className={`alert ${
+                    status.type === 'success'
+                      ? 'alert-success'
+                      : status.type === 'error'
+                      ? 'alert-danger'
+                      : 'alert-info'
+                  }`}
+                >
+                  {status.text}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="name" className="form-label">
                     Name
@@ -23,6 +77,8 @@ function Contact() {
                     type="text"
                     className="form-control"
                     id="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     placeholder="Enter your name"
                     required
                   />
@@ -36,6 +92,8 @@ function Contact() {
                     type="email"
                     className="form-control"
                     id="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="Enter your email"
                     required
                   />
@@ -49,13 +107,19 @@ function Contact() {
                     className="form-control"
                     id="message"
                     rows="4"
+                    value={formData.message}
+                    onChange={handleChange}
                     placeholder="Type your message..."
                     required
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn btn-success w-100">
-                  Send Message
+                <button
+                  type="submit"
+                  className="btn btn-success w-100"
+                  disabled={status?.type === 'loading'}
+                >
+                  {status?.type === 'loading' ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             </div>
