@@ -20,6 +20,7 @@ function Footer() {
                     Copy
                 </button>
             </div>
+            <p>&copy;{new Date().getFullYear()} CampusLearn</p>
         </footer>
     );
 }
