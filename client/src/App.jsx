@@ -10,6 +10,19 @@ import TutorLogin from './pages/TutorLogin.jsx';
 import StudentDash from './pages/StudentDash.jsx';
 import TutorDash from './pages/TutorDash.jsx';
 
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import Admin from './pages/Amin.jsx';
+import Profile from './pages/Profile.jsx';
+import Feedback from './pages/Feedback.jsx';
+import Messages from './pages/Message.jsx';
+import ThankYou from './pages/ThankYou.jsx';
+import Contact from './pages/Contact.jsx';
+import AdminLogin from './pages/AdminLogin.jsx';
+import Resource from './pages/Resource.jsx';
+import Discussion from './pages/Discussion.jsx';
+import ModuleCourse from './pages/ModuleCourse.jsx';
+import Topic from './pages/Topic.jsx';
+
 
 function App() {
     return (
@@ -21,7 +34,19 @@ function App() {
             <Route path="/TutLogin" element={<TutorLogin />} />
             <Route path="/student" element={<StudentDash />} />
             <Route path="/tutor" element={<TutorDash />} />
-            
+
+            <Route path= '/Forgot' element={<ForgotPassword/>}/>
+            <Route path= '/Admin' element={<Admin/>}/>
+            <Route path= '/profile' element={<Profile/>}/>
+            <Route path= '/Feedback' element={<Feedback/>}/>
+            <Route path= '/Message' element={<Messages/>}/>
+            <Route path= '/ThankYou' element={<ThankYou/>}/>
+            <Route path= '/Contact' element={<Contact/>}/>
+            <Route path= '/AdminLogin' element={<AdminLogin/>}/>
+            <Route path= '/resource' element={<Resource/>}/>
+            <Route path= '/Discussion' element={<Discussion/>}/>
+            <Route path= '/ModuleCourse' element={<ModuleCourse/>}/>
+            <Route path= '/Topic' element={<Topic/>}/>
         </Routes>
     );
 }
