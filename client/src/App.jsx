@@ -21,11 +21,7 @@ import AdminLogin from './pages/AdminLogin.jsx';
 import Resource from './pages/Resource.jsx';
 import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
-/*
 
-
-
-*/
 
 function App() {
     return (
