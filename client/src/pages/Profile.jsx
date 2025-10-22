@@ -2,6 +2,7 @@ import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 
 function Profile() {
+  
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
