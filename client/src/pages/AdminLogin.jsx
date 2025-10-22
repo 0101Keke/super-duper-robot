@@ -32,7 +32,7 @@ function AdminLogin(){
   }
   return(
     <div>
-      
+      <Header/>
       <div className="container my-5">
       <h1 className="text-center mb-4">Login</h1>
       {error && <div className="alert alert-danger">{error}</div>}

@@ -37,7 +37,7 @@ function StudentReg() {
 
     return (
         <div>
-            
+            <Header/>
             <div className="container my-5">
                 <h2 className="text-center mb-4">Student Registration</h2>
                 {error && <div className="alert alert-danger">{error}</div>}
