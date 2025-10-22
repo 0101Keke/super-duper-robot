@@ -13,6 +13,7 @@ import Contact from './pages/Contact.jsx';
 import Discussion from './pages/Discussion.jsx';
 import Feedback from './pages/Feedback.jsx';
 import Admin from './pages/Admin.jsx';
+import AdminReg from './pages/AdminReg.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import Profile from './pages/Profile.jsx';
 import Messages from './pages/Message.jsx';
@@ -39,6 +40,7 @@ function App() {
             <Route path="/Discussion" element={<Discussion />} />
             <Route path="/Feedback" element={<Feedback />} />
             <Route path="/Admin" element={<Admin />} />
+            <Route path="/AdminReg" element={<AdminReg />} /> 
             <Route path="/Forgot" element={<ForgotPassword />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/Message" element={<Messages />} />

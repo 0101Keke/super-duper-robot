@@ -106,7 +106,7 @@ function Login() {
 
                 <p className="text-center mt-3 mb-0 text-muted">
                   Don’t have an account?{' '}
-                  <a href="/register" className="text-dark fw-semibold">Register</a>
+                  <a href="/AdminReg" className="text-dark fw-semibold">Register</a>
                 </p>
               </div>
             </div>
