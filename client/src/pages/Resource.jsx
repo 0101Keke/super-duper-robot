@@ -21,7 +21,7 @@ function Resources() {
 
   const fetchResources = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/resources');
+      const response = await fetch('http://localhost:5000/api/resources');
       if (!response.ok) throw new Error('Failed to fetch resources');
       const data = await response.json();
       setResources(data);
@@ -36,7 +36,7 @@ function Resources() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3000/api/resources', {
+      const response = await fetch('http://localhost:5000/api/resources', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName, url: newUrl }),

@@ -32,7 +32,7 @@ function TopicsManager() {
 
   const fetchTopics = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/topics');
+      const response = await fetch('http://localhost:5000/api/topics');
       if (!response.ok) throw new Error('Failed to fetch topics');
       const data = await response.json();
       setTopics(data);
@@ -50,7 +50,7 @@ function TopicsManager() {
     setCreateSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:3000/api/topics', {
+      const response = await fetch('http://localhost:5000/api/topics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
