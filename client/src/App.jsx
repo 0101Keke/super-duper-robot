@@ -22,7 +22,6 @@ import Resource from './pages/Resource.jsx';
 import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
 
-
 function App() {
     return (
         <Routes>
@@ -31,21 +30,21 @@ function App() {
             <Route path="/StuLogin" element={<StudentLogin />} />
             <Route path="/TutReg" element={<TutorReg />} />
             <Route path="/TutLogin" element={<TutorLogin />} />
+            <Route path="/dashboard" element={<StudentDash />} />
             <Route path="/student" element={<StudentDash />} />
             <Route path="/tutor" element={<TutorDash />} />
-            <Route path= '/Contact' element={<Contact/>}/>
-            <Route path= '/Discussion' element={<Discussion/>}/>
-            <Route path= '/Feedback' element={<Feedback/>}/>
-            <Route path= '/Admin' element={<Admin/>}/>
-            <Route path= '/Forgot' element={<ForgotPassword/>}/>
-            <Route path= '/profile' element={<Profile/>}/>
-            <Route path= '/Message' element={<Messages/>}/>
-            <Route path= '/ThankYou' element={<ThankYou/>}/>
-            <Route path= '/AdminLogin' element={<AdminLogin/>}/>
-            <Route path= '/resource' element={<Resource/>}/>
-            <Route path= '/ModuleCourse' element={<ModuleCourse/>}/>
-            <Route path= '/Topic' element={<Topic/>}/>
-
+            <Route path="/Contact" element={<Contact />} />
+            <Route path="/Discussion" element={<Discussion />} />
+            <Route path="/Feedback" element={<Feedback />} />
+            <Route path="/Admin" element={<Admin />} />
+            <Route path="/Forgot" element={<ForgotPassword />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/Message" element={<Messages />} />
+            <Route path="/ThankYou" element={<ThankYou />} />
+            <Route path="/AdminLogin" element={<AdminLogin />} />
+            <Route path="/resource" element={<Resource />} />
+            <Route path="/ModuleCourse" element={<ModuleCourse />} />
+            <Route path="/Topic" element={<Topic />} />
         </Routes>
     );
 }
