@@ -42,9 +42,7 @@ function TutorReg() {
             submitData.append('phone', formData.phone);
             submitData.append('password', formData.password);
             submitData.append('role', 'tutor');
-            if (formData.cv) {
-                submitData.append('cv', formData.cv);
-            }
+           
 
             await authAPI.register(submitData);
             navigate('/TutLogin'); // Redirect to tutor login

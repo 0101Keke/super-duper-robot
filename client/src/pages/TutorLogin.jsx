@@ -71,7 +71,7 @@ function Register() {
                 submitData.append('cv', formData.cv);
             }
 
-            const response = await fetch('http://localhost:3000/api/auth/register', {
+            const response = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
                 body: submitData,
             });
@@ -89,7 +89,7 @@ function Register() {
             // Redirect based on role
             if (data.user.role === 'tutor') {
                 alert('Registration successful! Your account is pending approval.');
-                navigate('/login');
+                navigate('/tutor');
             } else {
                 navigate('/dashboard');
             }
