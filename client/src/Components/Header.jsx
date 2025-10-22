@@ -44,6 +44,10 @@ function Header() {
                             <Link to="/AdminLogin">
                                 <button className="btn btn-dark text-white">Admin</button>
                             </Link>
+                            <Link to="/chatbot">
+                            <button className="btn btn-dark text-white">Chatbot</button>
+                            </Link>
+
                         </>
                     ) : (
                         <>
