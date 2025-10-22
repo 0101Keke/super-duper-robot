@@ -62,20 +62,17 @@ router.post('/register', upload.single('cv'), async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-    
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        // Create new user (schema will hash password automatically)
+user = new User({
+    fullName,
+    email: email.toLowerCase(),
+    password,
+    phone,
+    role: role || 'student',
+    cv: req.file ? req.file.path : undefined
+});
 
-        // Create new user
-        user = new User({
-            fullName,
-            email: email.toLowerCase(),
-            password: hashedPassword, 
-      
-            phone,
-            role: role || 'student',
-            cv: req.file ? req.file.path : undefined
-        });
+        
 
         await user.save();
         console.log('User registered:', user.email);
