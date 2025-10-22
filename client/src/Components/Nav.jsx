@@ -21,6 +21,10 @@ function Nav() {
                     <Link to="/AdmLogin">
                         <button className="btn btn-dark text-white">Admin</button>
                     </Link>
+                    <Link to="/chatbot">
+                    <button className="btn btn-dark text-white">AI Assistant</button>
+                    </Link>
+
                 </>
             ) : (
                 <>

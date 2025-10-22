@@ -21,6 +21,8 @@ import AdminLogin from './pages/AdminLogin.jsx';
 import Resource from './pages/Resource.jsx';
 import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
+import Chatbot from './pages/Chatbot.jsx';
+
 
 function App() {
     return (
@@ -45,7 +47,8 @@ function App() {
             <Route path="/resource" element={<Resource />} />
             <Route path="/ModuleCourse" element={<ModuleCourse />} />
             <Route path="/Topic" element={<Topic />} />
-        </Routes>
+            <Route path="/chatbot" element={<Chatbot />} />
+               </Routes>
     );
 }
 
