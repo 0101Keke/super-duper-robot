@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Nav from '../components/Nav.jsx';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
@@ -125,49 +126,7 @@ const Dashboard = () => {
             {/* Top Navigation */}
             <nav className="navbar navbar-expand-lg navbar-dark bg-green shadow-sm">
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" href="/">CampusLearn</a>
-
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div className="collapse navbar-collapse" id="navbarNav">
-                        <ul className="navbar-nav me-auto">
-                            <li className="nav-item">
-                                <a className="nav-link" href="/courses">Courses</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="/forum">Forum</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="/tutors">Tutors</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="/profile">Profile</a>
-                            </li>
-                        </ul>
-
-                        <div className="d-flex align-items-center">
-                            <div className="dropdown">
-                                <button className="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                                    <div className="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px', fontSize: '14px' }}>
-                                        {user?.fullName?.charAt(0) || user?.name?.charAt(0) || user?.email?.charAt(0) || 'S'}
-                                    </div>
-                                    <span>{user?.fullName || user?.name || user?.email || 'Student'}</span>
-                                </button>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                    <li><a className="dropdown-item" href="/profile">Profile</a></li>
-                                    <li><a className="dropdown-item" href="/settings">Settings</a></li>
-                                    <li><hr className="dropdown-divider" /></li>
-                                    <li>
-                                        <button className="dropdown-item text-danger" onClick={handleLogout}>
-                                            Logout
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <Nav/>
                 </div>
             </nav>
 

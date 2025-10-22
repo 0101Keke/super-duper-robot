@@ -115,8 +115,7 @@ function TutorReg() {
                         onChange={handleChange}
                         required
                     />
-
-                    <label htmlFor="cv" className="form-label">CV:</label>
+                    {/* <label htmlFor="cv" className="form-label">CV:</label>
                     <input
                         type="file"
                         name="cv"
@@ -124,7 +123,7 @@ function TutorReg() {
                         accept=".pdf,.doc,.docx"
                         onChange={handleChange}
                     />
-                    <small className="text-muted">PDF, DOC, DOCX up to 10MB</small>
+                    <small className="text-muted">PDF, DOC, DOCX up to 10MB</small> */}
 
                     <button type="submit" className="btn btn-dark text-white w-100 mt-3">
                         Register

@@ -1,8 +1,9 @@
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
+import { useAuth } from '../contexts/AuthContext';
 
 function Profile() {
-  
+  const { user} = useAuth();
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
@@ -11,9 +12,9 @@ function Profile() {
         {/* BIO Section */}
         <div className="bg-light-green p-4 rounded shadow-sm mb-4 text-center">
           <h3 className="fw-bold mb-3">BIO</h3>
-          <p><strong>Name:</strong> John Doe</p>
-          <p><strong>Email:</strong> johndoe@example.com</p>
-          <p><strong>Role:</strong> Student</p>
+          <p><strong>Name:</strong> {user?.fullName || user?.name || 'Student'}</p>
+          <p><strong>Email:</strong> {user?.email}</p>
+          <p><strong>Role:</strong> {user?.role}</p>
         </div>
 
         {/* Update Profile Section */}
