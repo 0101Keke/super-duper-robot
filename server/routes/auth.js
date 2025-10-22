@@ -6,11 +6,18 @@ const User = require('../models/User');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = 'uploads/cvs/';
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Configure multer for CV uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/cvs/');
+        cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
@@ -36,23 +43,42 @@ router.post('/register', upload.single('cv'), async (req, res) => {
     try {
         const { fullName, email, password, phone, role } = req.body;
 
+        // Validation
+        if (!fullName || !email || !password) {
+            return res.status(400).json({
+                message: 'Please provide all required fields'
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                message: 'Password must be at least 6 characters'
+            });
+        }
+
         // Check if user exists
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email: email.toLowerCase() });
         if (user) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+    
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
         // Create new user
         user = new User({
             fullName,
-            email,
-            password,
+            email: email.toLowerCase(),
+            password: hashedPassword, 
+      
             phone,
             role: role || 'student',
             cv: req.file ? req.file.path : undefined
         });
 
         await user.save();
+        console.log('User registered:', user.email);
 
         // Create JWT token
         const payload = {
@@ -64,24 +90,28 @@ router.post('/register', upload.single('cv'), async (req, res) => {
 
         jwt.sign(
             payload,
-            process.env.JWT_SECRET || 'your-secret-key',
+            process.env.JWT_SECRET,
             { expiresIn: '7d' },
             (err, token) => {
                 if (err) throw err;
-                res.json({
+                res.status(201).json({
                     token,
                     user: {
                         id: user.id,
                         fullName: user.fullName,
                         email: user.email,
-                        role: user.role
+                        role: user.role,
+                        isApproved: user.isApproved
                     }
                 });
             }
         );
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Register error:', err);
+        res.status(500).json({
+            message: 'Server error during registration',
+            error: err.message
+        });
     }
 });
 
@@ -90,26 +120,37 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Validation
+        if (!email || !password) {
+            return res.status(400).json({
+                message: 'Please provide email and password'
+            });
+        }
+
         // Check if user exists
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         // Check password
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         // Check if tutor is approved
         if (user.role === 'tutor' && !user.isApproved) {
-            return res.status(403).json({ message: 'Your account is pending approval' });
+            return res.status(403).json({
+                message: 'Your account is pending approval'
+            });
         }
 
         // Update last login
         user.lastLogin = Date.now();
         await user.save();
+
+        console.log(' User logged in:', user.email);
 
         // Create JWT token
         const payload = {
@@ -121,7 +162,7 @@ router.post('/login', async (req, res) => {
 
         jwt.sign(
             payload,
-            process.env.JWT_SECRET || 'your-secret-key',
+            process.env.JWT_SECRET,
             { expiresIn: '7d' },
             (err, token) => {
                 if (err) throw err;
@@ -131,14 +172,18 @@ router.post('/login', async (req, res) => {
                         id: user.id,
                         fullName: user.fullName,
                         email: user.email,
-                        role: user.role
+                        role: user.role,
+                        isApproved: user.isApproved
                     }
                 });
             }
         );
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Login error:', err);
+        res.status(500).json({
+            message: 'Server error during login',
+            error: err.message
+        });
     }
 });
 
@@ -148,7 +193,7 @@ router.get('/me', auth, async (req, res) => {
         const user = await User.findById(req.user.id).select('-password');
         res.json(user);
     } catch (err) {
-        console.error(err.message);
+        console.error('Get user error:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
