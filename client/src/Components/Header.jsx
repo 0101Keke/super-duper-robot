@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import CLlogo from '../assets/CLlogo.jpeg';
 
 function Header() {
     const { user, logout } = useAuth();
@@ -17,7 +18,7 @@ function Header() {
                 <div className="d-flex align-items-center">
                     <Link to="/" className="text-decoration-none">
                         <img
-                            src="/logo.png"
+                            src={CLlogo }
                             alt="CampusLearn Logo"
                             width="40"
                             height="40"
