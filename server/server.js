@@ -28,6 +28,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/topics', require('./routes/topics'));
 app.use('/api/resources', require('./routes/resources'));
 app.use('/api/chatbot', require('./routes/chatbot'));
+app.use('/api/courses', require('./routes/courses'));
 
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));

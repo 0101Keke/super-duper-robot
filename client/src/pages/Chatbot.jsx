@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import API from '../api';
 import "./chatbot.css";
 
 function Chatbot() {
@@ -9,44 +10,36 @@ function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
-    if (!userInput.trim()) return;
+  if (!userInput.trim()) return;
+  const msg = { sender: 'user', text: userInput };
+  setMessages(prev => [...prev, msg]);
+  setUserInput('');
+  setIsLoading(true);
 
-    const userMsg = { sender: "user", text: userInput };
-    setMessages((prev) => [...prev, userMsg]);
-    setUserInput("");
-    setIsLoading(true);
+  try {
+    const res = await API.post('/chatbot', { message: userInput });
+    const data = res.data;
 
-    try {
-      const response = await fetch("http://localhost:5000/api/chatbot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userInput }),
-      });
-
-      const data = await response.json();
-      const structuredReply = formatReply(data.reply);
-
-      const botMsg = { sender: "bot", text: structuredReply };
-      setMessages((prev) => [...prev, botMsg]);
-    } catch (err) {
-      console.error("Chatbot error:", err);
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "⚠️ Sorry, something went wrong." },
-      ]);
-    } finally {
-      setIsLoading(false);
+    // Structured handling
+    if (data.type === 'tutors') {
+      // render a friendly summary + create buttons for booking
+      const text = data.reply + '\n' + data.data.map(t => `${t.name} — ${t.availability}`).join('\n');
+      setMessages(prev => [...prev, { sender: 'bot', text, meta: data }]);
+    } else if (data.type === 'resources') {
+      const text = data.reply;
+      setMessages(prev => [...prev, { sender: 'bot', text, meta: data }]);
+    } else {
+      setMessages(prev => [...prev, { sender: 'bot', text: data.reply }]);
     }
-  };
+  } catch (err) {
+    console.error('Chatbot error', err);
+    setMessages(prev => [...prev, { sender: 'bot', text: 'Sorry, something went wrong.' }]);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  // Format Gemini's raw text output into readable UI
-  const formatReply = (reply) => {
-    if (!reply) return "No response.";
-    return reply
-      .replace(/\n- /g, "<br>• ")
-      .replace(/\n/g, "<br>")
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  };
+
 
   const handleQuickAction = (action) => {
     setUserInput(action);
