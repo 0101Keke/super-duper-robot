@@ -24,7 +24,7 @@ export const authAPI = {
     register: (userData) => API.post('/auth/register', userData),
     login: (credentials) => API.post('/auth/login', credentials),
     getMe: () => API.get('/auth/me'),
-    getCurrentUser: () => API.get('/auth/me') // Add this alias for AuthContext
+    getCurrentUser: () => API.get('/auth/me') 
 };
 
 // Users endpoints (for profile management)

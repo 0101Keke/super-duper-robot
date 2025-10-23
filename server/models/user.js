@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
     },
     cv: {
         type: String, // URL to stored CV file
-        required: function () {
+        optional: function () {
             return this.role === 'tutor';
         }
     },
