@@ -49,6 +49,15 @@ router.post('/register', upload.single('cv'), async (req, res) => {
                 message: 'Please provide all required fields'
             });
         }
+        // Email validation for Belgium Campus students
+if (role === 'student') {
+  const studentEmailRegex = /^[a-zA-Z0-9._%+-]+@student\.belgiumcampus\.ac\.za$/;
+  if (!studentEmailRegex.test(email)) {
+    return res.status(400).json({
+      message: 'Only @student.belgiumcampus.ac.za emails are allowed for students'
+    });
+  }
+}
 
         if (password.length < 6) {
             return res.status(400).json({
