@@ -24,10 +24,59 @@ function Chatbot() {
       });
 
       const data = await response.json();
-      const structuredReply = formatReply(data.reply);
 
-      const botMsg = { sender: "bot", text: structuredReply };
-      setMessages((prev) => [...prev, botMsg]);
+if (data.structured) {
+  let structuredHTML = "";
+
+  if (data.type === "tutor") {
+    structuredHTML = `
+      <div class="structured-reply">
+        <h5 class="fw-bold text-success">${data.data.title}</h5>
+        <p>${data.data.description}</p>
+        ${data.data.tutors
+          .map(
+            (t) => `
+            <div class="tutor-card border p-2 rounded mb-2">
+              <strong>${t.name}</strong><br>
+              📧 ${t.email}<br>
+              🧾 Bio: ${t.bio}<br>
+              🆔 Staff ID: ${t.staffId}
+            </div>
+          `
+          )
+          .join("")}
+      </div>
+    `;
+  } else if (data.type === "resource") {
+    structuredHTML = `
+      <div class="structured-reply">
+        <h5 class="fw-bold text-primary">${data.data.title}</h5>
+        <p>${data.data.description}</p>
+        ${data.data.resources
+          .map(
+            (r) => `
+            <div class="resource-card border p-2 rounded mb-2">
+              <strong>${r.title}</strong><br>
+              📘 Course: ${r.course}<br>
+              💡 Type: ${r.fileType}<br>
+              👨‍🏫 Tutor: ${r.tutor}<br>
+              🔗 <a href="${r.fileUrl}" target="_blank" class="text-success">Open Resource</a>
+            </div>
+          `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  setMessages((prev) => [...prev, { sender: "bot", text: structuredHTML }]);
+}
+ else {
+  // Handle normal text (Gemini)
+  const structuredReply = formatReply(data.reply);
+  setMessages((prev) => [...prev, { sender: "bot", text: structuredReply }]);
+}
+
     } catch (err) {
       console.error("Chatbot error:", err);
       setMessages((prev) => [
@@ -73,9 +122,7 @@ function Chatbot() {
             <button className="btn btn-outline-success" onClick={() => handleQuickAction("View Resources")}>
               📚 View Resources
             </button>
-            <button className="btn btn-outline-success" onClick={() => handleQuickAction("Book Session")}>
-              📅 Book Session
-            </button>
+            
           </div>
 
           <div className="chat-window border rounded p-3 mb-3" id="message-container" style={{ height: "400px", overflowY: "auto" }}>
