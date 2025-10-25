@@ -75,6 +75,16 @@ user = new User({
         
 
         await user.save();
+        if (user.role === 'student') {
+  const Student = require('../models/Student');
+  const newStudent = new Student({
+    userId: user._id,
+    programme: req.body.programme || 'General Studies',
+    yearOfStudy: req.body.yearOfStudy || 1
+  });
+  await newStudent.save();
+  console.log('Student profile created for:', user.email);
+}
         console.log('User registered:', user.email);
 
         // Create JWT token
