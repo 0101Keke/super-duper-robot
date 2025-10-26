@@ -27,11 +27,17 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
   setLoading(true);
   try {
-    const res = await API.get('/student/dashboard');
-    const data = res.data;
+   
+const res = await API.get('/courses/enrolled'); 
+const coursesData = res.data;
 
-    setStats(data.stats);
-    setCourses(data.courses);
+setCourses(coursesData);
+setStats({
+  enrolledCourses: coursesData.length,
+  inProgress: coursesData.filter(c => c.progress < 100).length,
+  completed: coursesData.filter(c => c.progress === 100).length,
+  totalHours: coursesData.length * 5
+});
 
     setUpcomingDeadlines([
       { id: 1, title: 'React Assignment 1', course: 'Web Dev', daysLeft: 4, type: 'assignment' },

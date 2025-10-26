@@ -1,25 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const Course = require('../models/Course');
 const auth = require('../middleware/auth');
+const User = require('../models/User');
+const Course = require('../models/Course'); // Create this model if missing
 
-// Get all available courses
-router.get('/', auth, async (req, res) => {
-  const courses = await Course.find().populate('tutor', 'fullName');
-  res.json(courses);
-});
+// Get all enrolled courses for logged-in student
+router.get('/enrolled', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('courses');
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-// Enroll in a course
-router.post('/:id/enroll', auth, async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) return res.status(404).json({ message: 'Course not found' });
-
-  if (!course.enrolledStudents.includes(req.user.id)) {
-    course.enrolledStudents.push(req.user.id);
-    await course.save();
+    res.json(user.courses);
+  } catch (err) {
+    console.error('Courses fetch error:', err);
+    res.status(500).json({ message: 'Server error fetching courses' });
   }
-
-  res.json({ message: 'Enrolled successfully', course });
 });
 
 module.exports = router;

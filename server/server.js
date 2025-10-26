@@ -5,6 +5,11 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorhandler');
 const studentRoutes = require('./routes/student');
 const courseRoutes = require('./routes/course');
+const assignmentRoutes = require('./routes/assignment');
+const resourceRoutes = require('./routes/resources');
+const discussionRoutes = require('./routes/discussion');
+const profileRoutes = require('./routes/profile');
+const usersRouter = require("./routes/users");
 const path = require('path');
 
 const app = express();
@@ -32,6 +37,12 @@ app.use('/api/resources', require('./routes/resources'));
 app.use('/api/chatbot', require('./routes/chatbot'));
 app.use('/api/student', studentRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/assignments', assignmentRoutes);
+app.use('/api/resources', resourceRoutes);
+app.use('/api/discussions', discussionRoutes);
+app.use('/api/profile', profileRoutes);
+app.use("/api/users", usersRouter);
+
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 

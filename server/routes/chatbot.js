@@ -66,10 +66,10 @@ router.post("/", async (req, res) => {
           title: "Available Course Resources 📚",
           description: "Here are the latest study materials uploaded by tutors:",
           resources: resources.map((r) => ({
-            title: r.title,
+            title: r.title || "Untitled Resource",
             description: r.description || "No description",
             course: r.courseId?.name || "Unknown Course",
-            tutor: r.tutorId?.userId || "Unknown Tutor",
+            tutor: r.tutorId?.name || "Unknown Tutor",
             fileType: r.fileType || "file",
             fileUrl: r.fileUrl || r.link || "#",
           })),

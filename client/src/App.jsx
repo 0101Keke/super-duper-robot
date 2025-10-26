@@ -23,6 +23,7 @@ import Resource from './pages/Resource.jsx';
 import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
 import Chatbot from './pages/Chatbot.jsx';
+import Courses from './pages/CourseDetail.jsx'; // create if missing
 
 
 function App() {
@@ -50,6 +51,8 @@ function App() {
             <Route path="/ModuleCourse" element={<ModuleCourse />} />
             <Route path="/Topic" element={<Topic />} />
             <Route path="/chatbot" element={<Chatbot />} />
+            <Route path="/courses" element={<Courses />} /> {/* ✅ Add this */}
+            
                </Routes>
     );
 }

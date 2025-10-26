@@ -12,7 +12,7 @@ API.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
         if (token) {
-            config.headers['x-auth-token'] = token;
+            config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
     },
@@ -29,8 +29,8 @@ export const authAPI = {
 
 // Users endpoints (for profile management)
 export const usersAPI = {
-    getProfile: () => API.get('/users/profile'),
-    updateProfile: (data) => API.put('/users/profile', data),
+    getProfile: () => API.get('/profile/me'),
+    updateProfile: (data) => API.put('/profile/update', data),
     getAllStudents: () => API.get('/users/students'),
     getAllTutors: () => API.get('/users/tutors')
 };
@@ -68,5 +68,17 @@ export const dashboardAPI = {
     getTutorStats: () => API.get('/dashboard/tutor'),
     getAdminStats: () => API.get('/dashboard/admin')
 };
+
+// Course endpoints
+export const coursesAPI = {
+    getAll: () => API.get('/courses'), // for listing all courses
+    getEnrolled: () => API.get('/courses/enrolled'), // for student dashboard
+    getById: (id) => API.get(`/courses/${id}`), // for CourseDetail.jsx
+    submitAssignment: (courseId, formData) =>
+        API.post(`/courses/${courseId}/submit`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+};
+
 
 export default API;
