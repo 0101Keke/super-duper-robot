@@ -42,7 +42,7 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/discussions', discussionRoutes);
 app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 

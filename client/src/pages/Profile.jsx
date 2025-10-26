@@ -107,7 +107,7 @@ const Profile = () => {
                       ? previewImage
                       : profile?.profilePicture
                       ? `http://localhost:5000${profile.profilePicture}`
-                      : 'https://via.placeholder.com/150?text=Profile+Pic'
+                      : 'https://placehold.co/150x150?text=Profile+Pic'
                   }
                   alt="Profile"
                   className="rounded-circle mb-3 border border-success"
