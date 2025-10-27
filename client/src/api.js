@@ -24,15 +24,23 @@ export const authAPI = {
     register: (userData) => API.post('/auth/register', userData),
     login: (credentials) => API.post('/auth/login', credentials),
     getMe: () => API.get('/auth/me'),
-    getCurrentUser: () => API.get('/auth/me') // Add this alias for AuthContext
+    getCurrentUser: () => API.get('/auth/me')
 };
 
-// Users endpoints (for profile management)
+// Users endpoints 
 export const usersAPI = {
     getProfile: () => API.get('/users/profile'),
     updateProfile: (data) => API.put('/users/profile', data),
     getAllStudents: () => API.get('/users/students'),
-    getAllTutors: () => API.get('/users/tutors')
+    getAllTutors: () => API.get('/users/tutors'),
+    // admin functions
+    getRecentUsers: () => API.get('/users/recent'),
+    getPendingTutors: () => API.get('/users/tutors/pending'),
+    approveTutor: (id) => API.put(`/users/tutors/${id}/approve`),
+    rejectTutor: (id, reason) => API.put(`/users/tutors/${id}/reject`, { reason }),
+    getUserActivity: (id) => API.get(`/users/${id}/activity`),
+    banUser: (id) => API.put(`/users/${id}/ban`),
+    unbanUser: (id) => API.put(`/users/${id}/unban`)
 };
 
 // Topics endpoints
@@ -66,7 +74,22 @@ export const messagesAPI = {
 export const dashboardAPI = {
     getStudentStats: () => API.get('/dashboard/student'),
     getTutorStats: () => API.get('/dashboard/tutor'),
-    getAdminStats: () => API.get('/dashboard/admin')
+    getAdminStats: () => API.get('/admin/dashboard'), 
+   
+    getReports: () => API.get('/admin/reports'),
+    deleteReport: (id) => API.delete(`/admin/reports/${id}`),
+    resolveReport: (id) => API.put(`/admin/reports/${id}/resolve`)
+};
+
+
+export const coursesAPI = {
+    getAll: () => API.get('/courses'),
+    getById: (id) => API.get(`/courses/${id}`),
+    create: (courseData) =>API.post('/courses', courseData),
+    update: (id, courseData) => API.put(`/courses/${id}`, courseData),
+    delete: (id) => API.delete(`/courses/${id}`),
+    enroll: (id) => API.post(`/courses/${id}/enroll`),
+    getMyCourses: () => API.get('/courses/my/courses')
 };
 
 export default API;

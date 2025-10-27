@@ -28,6 +28,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/topics', require('./routes/topics'));
 app.use('/api/resources', require('./routes/resources'));
 app.use('/api/chatbot', require('./routes/chatbot'));
+app.use('/api/admin', require('./routes/admin'));
 
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
@@ -41,6 +42,10 @@ app.use((err, req, res, next) => {
         error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
+
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/users', require('./routes/Users'));
+app.use('/api/coursers', require('./routes/coursers'));
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

@@ -1,122 +1,147 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header.jsx';
-import Footer from '../components/Footer.jsx';
+import { authAPI } from '../api';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
-function Login() {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+function AdminLogin() {
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-    try {
-      // 👇 Direct API endpoint call (adjust base URL if needed)
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form),
-      });
+        try {
+            // Use the login endpoint
+            const response = await authAPI.login({
+                email: formData.email,
+                password: formData.password
+            });
 
-      const data = await response.json();
+            // Check if user is admin
+            if (response.data.user.role !== 'admin') {
+                setError('Access denied. Admin credentials required.');
+                localStorage.removeItem('token');
+                setLoading(false);
+                return;
+            }
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
+            // Store token and user data
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      // ✅ Assuming backend returns { token, user }
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+            // Redirect to admin dashboard
+            navigate('/admin');
 
-      // Redirect based on role
-      if (data.user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/profile');
-      }
+        } catch (error) {
+            console.error('Login error:', error);
 
-    } catch (err) {
-      console.error(err);
-      setError(err.message || 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (error.response?.status === 401) {
+                setError('Invalid email or password');
+            } else if (error.response?.status === 403) {
+                setError('Account is suspended or not approved');
+            } else {
+                setError(error.response?.data?.message || 'Login failed. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <div className="d-flex flex-column min-vh-100 bg-light">
-      <Header />
+    return (
+        <div>
+            <Header />
+            <div className="container my-5">
+                <h1 className="text-center mb-4">Admin Login</h1>
 
-      <div className="container py-5 flex-grow-1">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
-            <div className="card shadow-sm border-0">
-              <div className="card-body p-4">
-                <h2 className="fw-bold text-center mb-4">Login</h2>
+                {error && (
+                    <div className="alert alert-danger alert-dismissible fade show" role="alert" style={{ maxWidth: "400px", margin: "0 auto" }}>
+                        {error}
+                        <button type="button" className="btn-close" onClick={() => setError('')}></button>
+                    </div>
+                )}
 
-                {error && <div className="alert alert-danger text-center">{error}</div>}
+                <form
+                    className="p-4 rounded shadow bg-light"
+                    style={{ maxWidth: "400px", margin: "0 auto" }}
+                    onSubmit={handleSubmit}
+                >
+                    <div className="mb-3">
+                        <label htmlFor="email" className="form-label fw-bold">
+                            Admin Email:
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            className="form-control"
+                            placeholder="Enter admin email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            disabled={loading}
+                        />
+                    </div>
 
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="form-control"
-                      placeholder="Enter your email"
-                      value={form.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label fw-bold">
+                            Password:
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            className="form-control"
+                            placeholder="Enter password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                            disabled={loading}
+                        />
+                    </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      className="form-control"
-                      placeholder="Enter your password"
-                      value={form.password}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                    <button
+                        type="submit"
+                        className="btn btn-dark text-white w-100 mt-3"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Logging in...
+                            </>
+                        ) : (
+                            'Login as Admin'
+                        )}
+                    </button>
 
-                  <button
-                    type="submit"
-                    className="btn btn-dark w-100 mt-3"
-                    disabled={loading}
-                  >
-                    {loading ? 'Logging in...' : 'Login'}
-                  </button>
+                    {/* Development Helper - Using Vite's import.meta.env */}
+                    {import.meta.env.DEV && (
+                        <div className="mt-3 p-2 bg-info bg-opacity-10 border border-info rounded">
+                            <small className="text-muted">
+                                <strong>Dev Credentials:</strong><br />
+                                Email: admin@campuslearn.com<br />
+                                Password: admin123
+                            </small>
+                        </div>
+                    )}
                 </form>
-
-                <p className="text-center mt-3 mb-0 text-muted">
-                  Don’t have an account?{' '}
-                  <a href="/AdminReg" className="text-dark fw-semibold">Register</a>
-                </p>
-              </div>
             </div>
-          </div>
+            <Footer />
         </div>
-      </div>
-
-      <Footer />
-    </div>
-  );
+    );
 }
 
-export default Login;
+export default AdminLogin;

@@ -1,4 +1,4 @@
-// models/admin.js
+
 const mongoose = require('mongoose');
 const User = require('./User');
 
