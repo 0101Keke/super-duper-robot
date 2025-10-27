@@ -5,7 +5,7 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorhandler');
 const studentRoutes = require('./routes/student');
 const courseRoutes = require('./routes/course');
-const assignmentRoutes = require('./routes/assignment');
+const assignmentRoutes = require('./routes/assignments');
 const resourceRoutes = require('./routes/resources');
 const discussionRoutes = require('./routes/discussion');
 const profileRoutes = require('./routes/profile');
@@ -43,6 +43,7 @@ app.use('/api/discussions', discussionRoutes);
 app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 

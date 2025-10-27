@@ -41,17 +41,28 @@ router.get('/me', auth, async (req, res) => {
 // 📌 Update profile info (with optional picture)
 router.put('/update', auth, upload.single('profilePicture'), async (req, res) => {
   try {
-    const { fullName, phone, bio, password } = req.body;
+    const { fullName, phone, bio, newPassword, currentPassword } = req.body;
     const updateData = {};
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (fullName) updateData.fullName = fullName;
     if (phone) updateData.phone = phone;
     if (bio) updateData.bio = bio;
     if (req.file) updateData.profilePicture = `/uploads/profile/${req.file.filename}`;
 
-    if (password && password.length >= 6) {
+    // ✅ Optional password change
+    if (newPassword && currentPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters' });
+      }
       const salt = await bcrypt.genSalt(10);
-      updateData.password = await bcrypt.hash(password, salt);
+      updateData.password = await bcrypt.hash(newPassword, salt);
     }
 
     const updatedUser = await User.findByIdAndUpdate(req.user.id, updateData, {

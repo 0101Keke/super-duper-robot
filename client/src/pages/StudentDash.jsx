@@ -24,35 +24,41 @@ const Dashboard = () => {
         fetchDashboardData();
     }, []);
 
-    const fetchDashboardData = async () => {
-  setLoading(true);
-  try {
-   
-const res = await API.get('/courses/enrolled'); 
-const coursesData = res.data;
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      // ✅ Use real backend endpoint for student dashboard
+      const res = await API.get('/dashboard/student');
+      const data = res.data;
 
-setCourses(coursesData);
-setStats({
-  enrolledCourses: coursesData.length,
-  inProgress: coursesData.filter(c => c.progress < 100).length,
-  completed: coursesData.filter(c => c.progress === 100).length,
-  totalHours: coursesData.length * 5
-});
+      // Update stats
+      setStats({
+        enrolledCourses: data.totalCourses || 0,
+        inProgress: data.inProgress || 0,
+        completed: data.completedCourses || 0,
+        totalHours: data.studyHours || 0
+      });
 
-    setUpcomingDeadlines([
-      { id: 1, title: 'React Assignment 1', course: 'Web Dev', daysLeft: 4, type: 'assignment' },
-    ]);
-    setRecentActivity([
-      { id: 1, text: 'Logged in successfully', time: 'Just now' },
-    ]);
+      // Update courses list
+      setCourses(data.recentCourses || []);
 
-    setStudyStreak(5);
-  } catch (err) {
-    console.error('Dashboard Error:', err);
-  } finally {
-    setLoading(false);
-  }
-};
+      // Simulate or map real deadlines (optional)
+      setUpcomingDeadlines([
+        { id: 1, title: 'Next Assignment', course: 'Web Dev', daysLeft: 3, type: 'assignment' },
+      ]);
+
+      setRecentActivity([
+        { id: 1, text: 'Logged in successfully', time: 'Just now' },
+        { id: 2, text: 'Viewed Dashboard', time: 'A few seconds ago' },
+      ]);
+
+      setStudyStreak(5);
+    } catch (err) {
+      console.error('Dashboard Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
  
 
     const getGreeting = () => {

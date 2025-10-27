@@ -37,16 +37,17 @@ const CourseDetail = () => {
     const formData = new FormData();
     formData.append('file', selectedFile);
 
-    try {
-      await api.post(`/assignments/${courseId}/${assignmentId}/submit`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setMessage('✅ Assignment submitted successfully!');
-    } catch (err) {
-      console.error('Upload failed:', err);
-      setMessage('❌ Failed to submit assignment.');
-    }
-  };
+     try {
+    const res = await api.post(`/assignments/${courseId}/${assignmentId}/submit`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setMessage('✅ ' + res.data.message);
+    setSelectedFile(null);
+  } catch (err) {
+    console.error('Upload failed:', err);
+    setMessage('❌ Failed to submit assignment.');
+  }
+};
 
   if (loading) {
     return <div className="text-center py-5">Loading course...</div>;

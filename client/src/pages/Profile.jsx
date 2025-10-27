@@ -58,25 +58,36 @@ const Profile = () => {
 
   // Submit profile updates
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage({ type: '', text: '' });
+  e.preventDefault();
+  setMessage({ type: '', text: '' });
 
-    try {
-      const data = new FormData();
-      data.append('fullName', formData.fullName);
-      data.append('phone', formData.phone);
-      data.append('bio', formData.bio);
-      if (selectedFile) data.append('profilePicture', selectedFile);
+  try {
+    const data = new FormData();
+    data.append('fullName', formData.fullName);
+    data.append('phone', formData.phone);
+    data.append('bio', formData.bio);
 
-      const response = await usersAPI.updateProfile(data);
-      setProfile(response.data);
-      setMessage({ type: 'success', text: '✅ Profile updated successfully!' });
-      setSelectedFile(null);
-    } catch (error) {
-      console.error('Profile update failed:', error);
-      setMessage({ type: 'danger', text: '❌ Failed to update profile. Please try again.' });
-    }
-  };
+    // ✅ add password fields if filled
+    if (formData.currentPassword) data.append('currentPassword', formData.currentPassword);
+    if (formData.newPassword) data.append('newPassword', formData.newPassword);
+
+    // ✅ add profile picture
+    if (selectedFile) data.append('profilePicture', selectedFile);
+
+    const response = await usersAPI.updateProfile(data);
+    setProfile(response.data);
+    setMessage({ type: 'success', text: '✅ Profile updated successfully!' });
+
+    // Clear password fields for safety
+    setFormData(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
+    setSelectedFile(null);
+  } catch (error) {
+    console.error('Profile update failed:', error);
+    const msg = error.response?.data?.message || '❌ Failed to update profile. Please try again.';
+    setMessage({ type: 'danger', text: msg });
+  }
+};
+
 
   if (loading) {
     return (
@@ -153,6 +164,28 @@ const Profile = () => {
                     placeholder="Write something about yourself..."
                   ></textarea>
                 </div>
+
+                <div className="mb-3">
+  <label className="form-label fw-bold">Current Password</label>
+  <input
+    type="password"
+    name="currentPassword"
+    className="form-control"
+    value={formData.currentPassword || ''}
+    onChange={handleChange}
+  />
+</div>
+
+<div className="mb-3">
+  <label className="form-label fw-bold">New Password</label>
+  <input
+    type="password"
+    name="newPassword"
+    className="form-control"
+    value={formData.newPassword || ''}
+    onChange={handleChange}
+  />
+</div>
 
                 <div className="mb-3">
                   <label className="form-label fw-bold">Profile Picture</label>
