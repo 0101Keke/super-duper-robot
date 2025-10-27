@@ -45,7 +45,7 @@ function TutorReg() {
            
 
             await authAPI.register(submitData);
-            navigate('/TutLogin'); // Redirect to tutor login
+            navigate('/tutor');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
         }

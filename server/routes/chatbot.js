@@ -12,7 +12,7 @@ router.post("/", async (req, res) => {
   try {
     const normalizedMsg = message.toLowerCase();
 
-    // ✅ 1️⃣ Handle Tutor-related requests
+    //  Handle Tutor-related requests
     if (
       normalizedMsg.includes("find tutor") ||
       normalizedMsg.includes("tutor") ||

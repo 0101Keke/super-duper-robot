@@ -51,7 +51,7 @@ function App() {
             <Route path="/ModuleCourse" element={<ModuleCourse />} />
             <Route path="/Topic" element={<Topic />} />
             <Route path="/chatbot" element={<Chatbot />} />
-            <Route path="/courses" element={<Courses />} /> {/* ✅ Add this */}
+            <Route path="/courses" element={<Courses />} />
             
                </Routes>
     );
