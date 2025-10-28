@@ -24,6 +24,7 @@ import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
 import Chatbot from './pages/Chatbot.jsx';
 import Courses from './pages/CourseDetail.jsx'; // create if missing
+import StudentSubmissions from './pages/StudentSubmissions';
 
 
 function App() {
@@ -51,7 +52,8 @@ function App() {
             <Route path="/ModuleCourse" element={<ModuleCourse />} />
             <Route path="/Topic" element={<Topic />} />
             <Route path="/chatbot" element={<Chatbot />} />
-            <Route path="/courses" element={<Courses />} /> {/* ✅ Add this */}
+            <Route path="/courses" element={<Courses />} /> 
+            <Route path="/submissions" element={<StudentSubmissions />} />
             
                </Routes>
     );

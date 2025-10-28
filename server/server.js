@@ -44,6 +44,9 @@ app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/enrollments', require('./routes/enrollment'));
+app.use('/api/submissions', require('./routes/submission'));
+
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 
