@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav.jsx';
-
+import API from '../api'; // make sure API has axios with baseURL /api
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -24,73 +24,42 @@ const Dashboard = () => {
         fetchDashboardData();
     }, []);
 
-    const fetchDashboardData = async () => {
-        setLoading(true);
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      // ✅ Use real backend endpoint for student dashboard
+      const res = await API.get('/dashboard/student');
+      const data = res.data;
 
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 500));
+      // Update stats
+      setStats({
+        enrolledCourses: data.totalCourses || 0,
+        inProgress: data.inProgress || 0,
+        completed: data.completedCourses || 0,
+        totalHours: data.studyHours || 0
+      });
 
-            // Dummy data
-            const coursesData = [
-                {
-                    id: 1,
-                    title: 'Introduction to React',
-                    instructor: 'Dr. Sarah Johnson',
-                    category: 'Programming',
-                    progress: 65,
-                    thumbnail: 'https://placehold.co/300x180/4f46e5/FFF/png?text=React',
-                    nextLesson: 'Hooks & State Management'
-                },
-                {
-                    id: 2,
-                    title: 'Data Structures',
-                    instructor: 'Prof. Michael Chen',
-                    category: 'Computer Science',
-                    progress: 40,
-                    thumbnail: 'https://placehold.co/300x180/4f46e5/FFF/png?text=React',
-                    nextLesson: 'Binary Trees'
-                },
-                {
-                    id: 3,
-                    title: 'Web Design Fundamentals',
-                    instructor: 'Jane Williams',
-                    category: 'Design',
-                    progress: 80,
-                    thumbnail: 'https://placehold.co/300x180/4f46e5/FFF/png?text=React',
-                    nextLesson: 'Responsive Layouts'
-                }
-            ];
+      // Update courses list
+      setCourses(data.recentCourses || []);
 
-            setCourses(coursesData);
+      // Simulate or map real deadlines (optional)
+      setUpcomingDeadlines([
+        { id: 1, title: 'Next Assignment', course: 'Web Dev', daysLeft: 3, type: 'assignment' },
+      ]);
 
-            setStats({
-                enrolledCourses: 12,
-                inProgress: 5,
-                completed: 7,
-                totalHours: 48
-            });
+      setRecentActivity([
+        { id: 1, text: 'Logged in successfully', time: 'Just now' },
+        { id: 2, text: 'Viewed Dashboard', time: 'A few seconds ago' },
+      ]);
 
-            setUpcomingDeadlines([
-                { id: 1, title: 'React Project Submission', course: 'Introduction to React', daysLeft: 3, type: 'assignment' },
-                { id: 2, title: 'Data Structures Quiz', course: 'Data Structures', daysLeft: 7, type: 'quiz' },
-                { id: 3, title: 'Design Portfolio Review', course: 'Web Design', daysLeft: 5, type: 'review' }
-            ]);
-
-            setRecentActivity([
-                { id: 1, text: 'Completed "Introduction to Hooks"', time: '2 hours ago' },
-                { id: 2, text: 'Replied in "React Discussion Forum"', time: '5 hours ago' },
-                { id: 3, text: 'Submitted assignment for "Data Structures"', time: '1 day ago' },
-                { id: 4, text: 'Achieved 10-day study streak!', time: '2 days ago' }
-            ]);
-
-            setStudyStreak(10);
-            setLoading(false);
-        } catch (error) {
-            console.error('Error:', error);
-            setLoading(false);
-        }
-    };
+      setStudyStreak(5);
+    } catch (err) {
+      console.error('Dashboard Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+ 
 
     const getGreeting = () => {
         const hour = new Date().getHours();

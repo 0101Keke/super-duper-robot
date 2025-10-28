@@ -1,73 +1,54 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User = require('../models/User');
-const auth = require('../middleware/auth');
-const isAdmin = auth.isAdmin;
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const User = require("../models/User");
+const auth = require("../middleware/auth");
 
-// GET /api/users/recent - Get recent users
-router.get('/recent', auth, isAdmin, async (req, res) => {
-    try {
-        const users = await User.find()
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .select('-password');
+// ✅ Create upload folder if it doesn't exist
+const uploadDir = path.join(__dirname, "../uploads/profile");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-        res.json(users);
-    } catch (error) {
-        console.error('Error fetching recent users:', error);
-        res.status(500).json({ message: 'Error fetching users', error: error.message });
-    }
+// ✅ Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
+
+// ✅ Get current user profile
+router.get("/profile", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    console.error("Profile fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-// GET /api/users/pending-tutors - Get tutors pending approval
-router.get('/pending-tutors', auth, isAdmin, async (req, res) => {
-    try {
-        const tutors = await User.find({
-            role: 'tutor',
-            isApproved: false
-        })
-            .select('-password')
-            .sort({ createdAt: -1 });
-
-        res.json(tutors);
-    } catch (error) {
-        console.error('Error fetching pending tutors:', error);
-        res.status(500).json({ message: 'Error fetching tutors', error: error.message });
+// ✅ Update profile info + picture
+router.put("/profile", auth, upload.single("profilePicture"), async (req, res) => {
+  try {
+    const updates = req.body;
+    if (req.file) {
+      updates.profilePicture = `/uploads/profile/${req.file.filename}`;
     }
-});
 
-// PUT /api/users/approve-tutor/:id - Approve a tutor
-router.put('/approve-tutor/:id', auth, isAdmin, async (req, res) => {
-    try {
-        const tutor = await User.findByIdAndUpdate(
-            req.params.id,
-            { isApproved: true },
-            { new: true }
-        ).select('-password');
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, {
+      new: true,
+    }).select("-password");
 
-        if (!tutor) {
-            return res.status(404).json({ message: 'Tutor not found' });
-        }
-
-        res.json({ message: 'Tutor approved successfully', tutor });
-    } catch (error) {
-        console.error('Error approving tutor:', error);
-        res.status(500).json({ message: 'Error approving tutor', error: error.message });
-    }
-});
-
-// GET /api/users - Get all users
-router.get('/', auth, isAdmin, async (req, res) => {
-    try {
-        const users = await User.find()
-            .select('-password')
-            .sort({ createdAt: -1 });
-
-        res.json(users);
-    } catch (error) {
-        console.error('Error fetching all users:', error);
-        res.status(500).json({ message: 'Error fetching users', error: error.message });
-    }
+    res.json(updatedUser);
+  } catch (err) {
+    console.error("Profile update error:", err);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
 });
 
 module.exports = router;
