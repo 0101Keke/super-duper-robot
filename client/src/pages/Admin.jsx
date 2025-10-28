@@ -8,7 +8,7 @@ function Admin() {
     const navigate = useNavigate();
     const [stats, setStats] = useState({
         users: 0,
-        tutors: 0,s
+        tutors: 0,
         courses: 0,
         reports: 0,
     });

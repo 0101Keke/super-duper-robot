@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-<<<<<<< HEAD
-=======
+
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
@@ -132,7 +131,7 @@ user = new User({
     }
 });
 
->>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10
+
 
 router.post('/login', async (req, res) => {
     try {
