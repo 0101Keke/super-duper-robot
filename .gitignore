@@ -11,3 +11,9 @@ client/.env
 .env.local
 client/node_modules/.vite/deps/_metadata.json
 client/node_modules/.vite/deps/_metadata.json
+server/node_modules/eslint/lib/rules/no-invalid-this.js
+/server/node_modules
+server/node_modules/.bin/acorn
+server/node_modules/.bin/acorn.ps1
+server/node_modules/@sendgrid/helpers/classes/personalization.d.ts
+server/node_modules/@sendgrid/helpers/classes/personalization.d.ts

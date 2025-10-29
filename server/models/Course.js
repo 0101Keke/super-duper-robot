@@ -1,7 +1,7 @@
 // server/models/Course.js
 const mongoose = require('mongoose');
 
-const CourseSchema = new mongoose.Schema({
+const courseSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -139,4 +139,4 @@ courseSchema.virtual('availableSeats').get(function () {
     return this.maxStudents - this.enrolledStudents.length;
 });
 
-module.exports = mongoose.model('Course', CourseSchema);
+module.exports = mongoose.model('Course', courseSchema);
