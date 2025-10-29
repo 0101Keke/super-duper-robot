@@ -39,23 +39,31 @@ const Submission = require('../models/Submission');
 router.get('/student', auth, async (req, res) => {
   try {
     const userId = req.user.id;
-    const enrolledCourses = await Enrollment.find({ studentId: userId }).populate('courseId');
-    const submissions = await Submission.find({ studentId: userId });
 
-    const completedAssignments = submissions.length;
-    const totalCourses = enrolledCourses.length;
+    // Fetch enrolled courses (safe even if empty)
+    const enrollments = await Enrollment.find({ studentId: userId }).populate('courseId').lean();
+    const submissions = await Submission.find({ studentId: userId }).populate('assignment').lean();
+
+    // Compute stats safely
+    const totalCourses = enrollments.length || 0;
+    const completedCourses = enrollments.filter(e => e.progress === 100).length;
+    const inProgress = enrollments.filter(e => e.progress < 100).length;
+    const completedAssignments = submissions.length || 0;
+
+    // Example study hours = 5 hours per course
+    const studyHours = totalCourses * 5;
 
     res.json({
       totalCourses,
+      completedCourses,
+      inProgress,
       completedAssignments,
-      inProgress: enrolledCourses.filter(e => e.progress < 100).length,
-      completedCourses: enrolledCourses.filter(e => e.progress === 100).length,
-      studyHours: totalCourses * 5,
-      recentCourses: enrolledCourses.slice(0, 3).map(e => ({
-        id: e.courseId._id,
-        title: e.courseId.title,
-        thumbnail: e.courseId.thumbnail,
-        category: e.courseId.category
+      studyHours,
+      recentCourses: enrollments.slice(0, 3).map(e => ({
+        id: e.courseId?._id,
+        title: e.courseId?.title || 'Untitled Course',
+        thumbnail: e.courseId?.thumbnail || '/default-course.jpg',
+        category: e.courseId?.category || 'General'
       }))
     });
   } catch (err) {

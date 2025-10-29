@@ -208,11 +208,12 @@ const Profile = () => {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-outline-danger px-4"
-                    onClick={logout}
-                  >
-                    Logout
-                  </button>
+                      className="btn btn-outline-danger px-4"
+                        onClick={() => {
+                              logout();
+                                 window.location.href = '/login';  }}>
+                                    Logout
+                                    </button>
                 </div>
               </form>
             </div>
