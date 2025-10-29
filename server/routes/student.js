@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const Course = require('../models/Course');
 const Student = require('../models/Student');
-const User = require('../models/User');
+const User = require('../models/user');
 
 // GET student dashboard data
 router.get('/dashboard', auth, async (req, res) => {

@@ -35,10 +35,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/topics', require('./routes/topics'));
 app.use('/api/resources', require('./routes/resources'));
 app.use('/api/chatbot', require('./routes/chatbot'));
-<<<<<<< HEAD
 app.use('/api/admin', require('./routes/admin'));
 
-=======
 app.use('/api/student', studentRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/assignments', assignmentRoutes);
@@ -48,7 +46,6 @@ app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/dashboard', require('./routes/dashboard'));
->>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 
@@ -63,7 +60,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use('/api/dashboard', require('./routes/dashboard'));
-app.use('/api/users', require('./routes/Users'));
+app.use('/api/users', require('./routes/users'));
 app.use('/api/coursers', require('./routes/coursers'));
 
 const port = process.env.PORT || 5000;
