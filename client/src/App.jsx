@@ -23,8 +23,10 @@ import Resource from './pages/Resource.jsx';
 import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
 import Chatbot from './pages/Chatbot.jsx';
-import Courses from './pages/CourseDetail.jsx'; // create if missing
-import StudentSubmissions from './pages/StudentSubmissions';
+import Courses from './pages/Courses.jsx'; 
+import MyCourses from './pages/MyCourses.jsx';
+import Assignments from './pages/Assignments.jsx'
+import StudentSubmissions from './pages/StudentSubmissions.jsx';
 
 
 function App() {
@@ -53,7 +55,9 @@ function App() {
             <Route path="/Topic" element={<Topic />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/courses" element={<Courses />} /> 
-            <Route path="/submissions" element={<StudentSubmissions />} />
+            <Route path="/courses/my-courses" element={<MyCourses />} />
+            <Route path="/courses/:courseId/assignments" element={<Assignments />} />
+            <Route path="/student/my-submissions" element={<StudentSubmissions />} />
             
                </Routes>
     );

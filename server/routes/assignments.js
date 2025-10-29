@@ -28,7 +28,7 @@ const upload = multer({ storage });
 // ================================
 
 // 1️⃣ Get all assignments for a course
-router.get('/:courseId', auth, async (req, res) => {
+router.get('/course/:courseId', auth, async (req, res) => {
   try {
     const assignments = await Assignment.find({ course: req.params.courseId })
       .populate('createdBy', 'fullName email')
