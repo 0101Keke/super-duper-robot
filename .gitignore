@@ -10,3 +10,4 @@ client/.env
 *.env
 .env.local
 client/node_modules/.vite/deps/_metadata.json
+client/node_modules/.vite/deps/_metadata.json
