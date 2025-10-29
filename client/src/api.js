@@ -92,16 +92,7 @@ export const coursesAPI = {
     getMyCourses: () => API.get('/courses/my/courses')
 };
 
-// Course endpoints
-export const coursesAPI = {
-    getAll: () => API.get('/courses'), // for listing all courses
-    getEnrolled: () => API.get('/courses/enrolled'), // for student dashboard
-    getById: (id) => API.get(`/courses/${id}`), // for CourseDetail.jsx
-    submitAssignment: (courseId, formData) =>
-        API.post(`/courses/${courseId}/submit`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-};
+
 
 
 export default API;
