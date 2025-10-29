@@ -1,64 +1,88 @@
 // server/routes/dashboard.js
 const express = require('express');
 const router = express.Router();
+
+const auth = require('../middleware/auth');          // main auth middleware (sets req.user = { id, role })
+const isAdmin = auth.isAdmin;                        // admin gate
+
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Course = require('../models/Course');
+const Assignment = require('../models/Assignment');
+const Submission = require('../models/Submission');
 
-// Student dashboard stats
+/**
+ * GET /api/dashboard/student
+ * Returns dashboard data for the logged-in student.
+ */
 router.get('/student', auth, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const user = await User.findById(userId).select('-password');
-        const student = await Student.findOne({ userId });
-        const enrolledCourses = await Course.find({
-            enrolledStudents: userId
-        });
+  try {
+    // Enrolled courses from User.courses (expects courses: [ObjectId] with ref 'Course')
+    const me = await User.findById(req.user.id)
+      .populate('courses', 'title category instructor thumbnail status');
 
-        res.json({
-            user,
-            student,
-            stats: {
-                enrolledCourses: enrolledCourses.length,
-                completed: enrolledCourses.filter(c =>
-                    (c.progress?.get(userId) || 0) >= 100
-                ).length,
-                inProgress: enrolledCourses.filter(c =>
-                    (c.progress?.get(userId) || 0) < 100
-                ).length
-            },
-            courses: enrolledCourses
-        });
-    } catch (err) {
-        console.error('Student dashboard error:', err);
-        res.status(500).json({ message: 'Server error' });
-    }
+    const enrolledCourses = me?.courses || [];
+
+    // Upcoming assignments in next 14 days across enrolled courses
+    const courseIds = enrolledCourses.map(c => c._id);
+    const now = new Date();
+    const soon = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    const upcomingAssignments = courseIds.length
+      ? await Assignment.find({
+          course: { $in: courseIds },
+          dueDate: { $gte: now, $lte: soon }
+        })
+          .select('title dueDate course')
+          .populate('course', 'title')
+          .sort({ dueDate: 1 })
+      : [];
+
+    // Recent submissions by this student
+    const recentSubmissions = await Submission.find({ student: req.user.id })
+      .select('submittedAt grade assignment fileUrl')
+      .populate('assignment', 'title course')
+      .sort({ submittedAt: -1 })
+      .limit(5);
+
+    return res.json({
+      enrolledCount: enrolledCourses.length,
+      enrolledCourses,
+      upcomingAssignments,
+      recentSubmissions
+    });
+  } catch (e) {
+    console.error('STUDENT DASH ERROR:', e);
+    return res.status(500).json({ message: 'Failed to load student dashboard' });
+  }
 });
 
-// Tutor dashboard stats
-router.get('/tutor', auth, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const courses = await Course.find({ tutor: userId });
+/**
+ * GET /api/dashboard/stats
+ * Admin metrics (unchanged from your file).
+ */
+router.get('/stats', auth, isAdmin, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalTutors = await User.countDocuments({ role: 'tutor', isApproved: true });
+    const totalStudents = await User.countDocuments({ role: 'student' });
+    const pendingTutors = await User.countDocuments({ role: 'tutor', isApproved: false });
+    const totalCourses = await Course.countDocuments();
+    const activeCourses = await Course.countDocuments({ status: 'active' });
 
-        res.json({
-            stats: {
-                totalCourses: courses.length,
-                totalStudents: courses.reduce((sum, c) =>
-                    sum + c.enrolledStudents.length, 0
-                ),
-                activeCourses: courses.filter(c => c.status === 'active').length
-            },
-            courses
-        });
-    } catch (err) {
-        console.error('Tutor dashboard error:', err);
-        res.status(500).json({ message: 'Server error' });
-    }
+    return res.json({
+      totalUsers,
+      totalTutors,
+      totalStudents,
+      pendingTutors,
+      totalCourses,
+      activeCourses
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    return res.status(500).json({ message: 'Error fetching stats', error: error.message });
+  }
 });
-
-
-
-
 
 module.exports = router;
+
