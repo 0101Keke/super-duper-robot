@@ -82,16 +82,6 @@ export const dashboardAPI = {
 };
 
 
-export const coursesAPI = {
-    getAll: () => API.get('/courses'),
-    getById: (id) => API.get(`/courses/${id}`),
-    create: (courseData) =>API.post('/courses', courseData),
-    update: (id, courseData) => API.put(`/courses/${id}`, courseData),
-    delete: (id) => API.delete(`/courses/${id}`),
-    enroll: (id) => API.post(`/courses/${id}/enroll`),
-    getMyCourses: () => API.get('/courses/my/courses')
-};
-
 // Course endpoints
 export const coursesAPI = {
     getAll: () => API.get('/courses'), // for listing all courses

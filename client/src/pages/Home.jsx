@@ -52,19 +52,14 @@ const Home = () => {
                                         Student Registration
                                     </button>
                                 </Link>
-                                <Link to="/StuLogin">
-                                    <button className="btn btn-outline-success btn-lg px-4">
-                                        Student Login
-                                    </button>
-                                </Link>
                                 <Link to="/TutReg">
                                     <button className="btn btn-success btn-lg px-4">
                                         Tutor Registration
                                     </button>
                                 </Link>
-                                <Link to="/TutLogin">
-                                    <button className="btn btn-outline-success btn-lg px-4">
-                                        Tutor Login
+                                <Link to="/AdminReg">
+                                    <button className="btn btn-success btn-lg px-4">
+                                        Admin Registration
                                     </button>
                                 </Link>
                             </div>
@@ -84,11 +79,13 @@ const Home = () => {
                                     <p className="card-text text-muted">
                                         Engage in meaningful discussions with peers and tutors on various topics
                                     </p>
-                                    <Link to="/Discussion">
-                                        <button className="btn btn-outline-success">
-                                            Explore Discussions
-                                        </button>
-                                    </Link>
+                                    {user && (
+                                        <Link to="/Discussion">
+                                            <button className="btn btn-outline-success">
+                                                Explore Discussions
+                                            </button>
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -104,11 +101,13 @@ const Home = () => {
                                     <p className="card-text text-muted">
                                         Access a wide range of study materials, notes, and educational resources
                                     </p>
-                                    <Link to="/Resource">
-                                        <button className="btn btn-outline-success">
-                                            View Resources
-                                        </button>
-                                    </Link>
+                                    {user && (
+                                        <Link to="/Resource">
+                                            <button className="btn btn-outline-success">
+                                                View Resources
+                                            </button>
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -124,11 +123,13 @@ const Home = () => {
                                     <p className="card-text text-muted">
                                         Connect directly with tutors and classmates for personalized help
                                     </p>
-                                    <Link to="/Message">
-                                        <button className="btn btn-outline-success">
-                                            Start Chatting
-                                        </button>
-                                    </Link>
+                                    {user && (
+                                        <Link to="/Message">
+                                            <button className="btn btn-outline-success">
+                                                Start Chatting
+                                            </button>
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>

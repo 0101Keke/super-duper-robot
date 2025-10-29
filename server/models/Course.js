@@ -1,121 +1,67 @@
-const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-<<<<<<< HEAD
-const CourseSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    subject: {
-        type: String,
-        required: true,
-        enum: ['Math', 'Science', 'English', 'History', 'Computer Science', 'Languages', 'Arts', 'Other']
-    },
-    level: {
-        type: String,
-        required: true,
-        enum: ['Beginner', 'Intermediate', 'Advanced']
-    },
-    tutor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    price: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    duration: {
-        type: Number, // in hours
-        required: true
-    },
-    maxStudents: {
-        type: Number,
-        default: 10
-    },
-    enrolledStudents: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    schedule: {
-        day: {
-            type: String,
-            enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        },
-        time: String, // e.g., "10:00 AM"
-    },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
-        type: Date,
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['active', 'completed', 'cancelled', 'draft'],
-        default: 'active'
-    },
-    thumbnail: {
-        type: String, // URL or path to image
-        default: null
-    },
-    syllabus: [{
-        week: Number,
-        topic: String,
-        description: String
-    }],
-    isPublished: {
-        type: Boolean,
-        default: true
+/**
+ * ?? Main authentication middleware
+ */
+const auth = (req, res, next) => {
+    const authHeader = req.header('Authorization');
+    let token = null;
+
+    // Accept either Bearer token or x-auth-token
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    } else if (req.header('x-auth-token')) {
+        token = req.header('x-auth-token');
     }
-}, {
-    timestamps: true
-});
 
-// Index for faster queries
-CourseSchema.index({ tutor: 1, status: 1 });
-CourseSchema.index({ subject: 1, level: 1 });
-
-// Virtual for enrolled count
-CourseSchema.virtual('enrolledCount').get(function () {
-    return this.enrolledStudents.length;
-});
-
-// Virtual for available seats
-CourseSchema.virtual('availableSeats').get(function () {
-    return this.maxStudents - this.enrolledStudents.length;
-});
-
-module.exports = mongoose.model('Course', CourseSchema);
-=======
-const courseSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String },
-  category: { type: String },
-  tutor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  thumbnail: { type: String },
-  enrolledStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  progress: {
-    type: Map,
-    of: Number, // progress percentage per studentId
-    default: {}
-  },
-  resources: [
-    {
-      title: String,
-      type: { type: String, enum: ['PDF', 'Video', 'Link'], default: 'PDF' },
-      url: String
+    if (!token) {
+        return res.status(401).json({ message: 'No token, authorization denied' });
     }
-  ]
-}, { timestamps: true });
 
-module.exports = mongoose.model('Course', courseSchema);
->>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        req.user = decoded.user;
+        next();
+    } catch (err) {
+        console.error('Token verification error:', err.message);
+        res.status(401).json({ message: 'Token is not valid' });
+    }
+};
+
+/**
+ * ????? Admin check middleware
+ */
+const isAdmin = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        next();
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * ?? Tutor check middleware
+ */
+const isTutor = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (user.role !== 'tutor' || !user.isApproved) {
+            return res.status(403).json({ message: 'Access denied. Approved tutors only.' });
+        }
+        next();
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// ? Proper exports
+module.exports = auth;
+module.exports.isAdmin = isAdmin;
+module.exports.isTutor = isTutor;

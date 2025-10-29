@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-<<<<<<< HEAD
 const User = require('../models/User');
 const Course = require('../models/Course');
 const auth = require('../middleware/auth');
+const Enrollment = require('../models/Enrollment');
+const Submission = require('../models/Submission');
 const isAdmin = auth.isAdmin;
 
 // GET /api/dashboard/stats
@@ -29,12 +30,6 @@ router.get('/stats', auth, isAdmin, async (req, res) => {
         res.status(500).json({ message: 'Error fetching stats', error: error.message });
     }
 });
-
-module.exports = router;
-=======
-const auth = require('../middleware/auth');
-const Enrollment = require('../models/Enrollment');
-const Submission = require('../models/Submission');
 
 router.get('/student', auth, async (req, res) => {
   try {
@@ -65,4 +60,3 @@ router.get('/student', auth, async (req, res) => {
 });
 
 module.exports = router;
->>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10

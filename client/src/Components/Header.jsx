@@ -18,7 +18,7 @@ function Header() {
                 <div className="d-flex align-items-center">
                     <Link to="/" className="text-decoration-none">
                         <img
-                            src={CLlogo }
+                            src={CLlogo}
                             alt="CampusLearn Logo"
                             width="40"
                             height="40"
@@ -37,18 +37,17 @@ function Header() {
                     {!user ? (
                         <>
                             <Link to="/StuLogin">
-                                <button className="btn btn-dark text-white">Student</button>
+                                <button className="btn btn-dark text-white">Student Login</button>
                             </Link>
                             <Link to="/TutLogin">
-                                <button className="btn btn-dark text-white">Tutor</button>
+                                <button className="btn btn-dark text-white">Tutor Login</button>
                             </Link>
                             <Link to="/AdminLogin">
-                                <button className="btn btn-dark text-white">Admin</button>
+                                <button className="btn btn-dark text-white">Admin Login</button>
                             </Link>
-                            <Link to="/chatbot">
-                            <button className="btn btn-dark text-white">Chatbot</button>
+                            <Link to="/StuReg">
+                                <button className="btn btn-dark text-white">Register</button>
                             </Link>
-
                         </>
                     ) : (
                         <>
@@ -63,6 +62,9 @@ function Header() {
                                     <Link to="/Resource">
                                         <button className="btn btn-dark text-white">Resources</button>
                                     </Link>
+                                    <Link to="/chatbot">
+                                        <button className="btn btn-dark text-white">AI Assistant</button>
+                                    </Link>
                                 </>
                             )}
                             {user.role === 'tutor' && (
@@ -76,25 +78,27 @@ function Header() {
                                     <Link to="/ModuleCourse">
                                         <button className="btn btn-dark text-white">Modules</button>
                                     </Link>
+                                    <Link to="/chatbot">
+                                        <button className="btn btn-dark text-white">AI Assistant</button>
+                                    </Link>
                                 </>
                             )}
                             {user.role === 'admin' && (
-                                <Link to="/Admin">
-                                    <button className="btn btn-dark text-white">Admin Panel</button>
-                                </Link>
+                                <>
+                                    <Link to="/Admin">
+                                        <button className="btn btn-dark text-white">Admin Panel</button>
+                                    </Link>
+                                    <Link to="/chatbot">
+                                        <button className="btn btn-dark text-white">AI Assistant</button>
+                                    </Link>
+                                </>
                             )}
                         </>
                     )}
                 </nav>
 
-                {/* Right: Search + Profile/Logout */}
+                {/* Right: Profile/Logout */}
                 <div className="d-flex align-items-center gap-2">
-                    <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        placeholder="Search..."
-                        style={{ width: "150px" }}
-                    />
                     {user ? (
                         <>
                             <Link to="/profile">
@@ -104,11 +108,7 @@ function Header() {
                                 Logout
                             </button>
                         </>
-                    ) : (
-                        <Link to="/StuLogin">
-                            <button className="btn btn-dark text-white">Login</button>
-                        </Link>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </header>
