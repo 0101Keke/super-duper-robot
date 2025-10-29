@@ -50,7 +50,11 @@ router.put('/update', auth, upload.single('profilePicture'), async (req, res) =>
     if (fullName) updateData.fullName = fullName;
     if (phone) updateData.phone = phone;
     if (bio) updateData.bio = bio;
-    if (req.file) updateData.profilePicture = `/uploads/profile/${req.file.filename}`;
+   if (req.file) {
+  user.profilePicture = `/uploads/${req.file.filename}`;
+}
+await user.save();
+
 
     // ✅ Optional password change
     if (newPassword && currentPassword) {

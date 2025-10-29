@@ -1,7 +1,6 @@
 // server/routes/dashboard.js
 const express = require('express');
-const router = express.Router();  
-const auth = require('../middleware/auth');
+const router = express.Router();
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Course = require('../models/Course');

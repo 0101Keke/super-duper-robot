@@ -1,8 +1,7 @@
 // server/models/Course.js
 const mongoose = require('mongoose');
 
-const courseSchema = new mongoose.Schema({
-    // Basic Information
+const CourseSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -140,5 +139,4 @@ courseSchema.virtual('availableSeats').get(function () {
     return this.maxStudents - this.enrolledStudents.length;
 });
 
-// Prevent model overwrite error
-module.exports = mongoose.models.Course || mongoose.model('Course', courseSchema);
+module.exports = mongoose.model('Course', CourseSchema);
