@@ -21,7 +21,7 @@ function AssignStudent() {
       try {
         const [coursesRes, studentsRes] = await Promise.all([
           fetch('http://localhost:5000/api/courses'),
-          //fetch('http://localhost:5000/api/students'),
+          fetch('http://localhost:5000/api/users/students'), // ✅ fixed endpoint
         ]);
 
         if (!coursesRes.ok || !studentsRes.ok)
@@ -65,14 +65,14 @@ function AssignStudent() {
         }),
       });
 
-      if (res.status === 409) {
-        setError('This student is already assigned to that course.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'Failed to assign student.');
         return;
       }
 
-      if (!res.ok) throw new Error('Failed to assign student.');
-
-      setSuccess('Student successfully added to course!');
+      setSuccess('✅ Student successfully added to course!');
       setSelectedCourse('');
       setSelectedStudent('');
 
@@ -120,7 +120,7 @@ function AssignStudent() {
                   <option value="">-- Choose a course --</option>
                   {courses.map((course) => (
                     <option key={course._id} value={course._id}>
-                      {course.title}
+                      {course.title || course.name}
                     </option>
                   ))}
                 </select>
@@ -138,7 +138,7 @@ function AssignStudent() {
                   <option value="">-- Choose a student --</option>
                   {students.map((student) => (
                     <option key={student._id} value={student._id}>
-                      {student.fullName} ({student.email})
+                      {student.fullName || student.name} ({student.email})
                     </option>
                   ))}
                 </select>
