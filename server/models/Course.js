@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+<<<<<<< HEAD
 const CourseSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -94,3 +95,27 @@ CourseSchema.virtual('availableSeats').get(function () {
 });
 
 module.exports = mongoose.model('Course', CourseSchema);
+=======
+const courseSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String },
+  category: { type: String },
+  tutor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  thumbnail: { type: String },
+  enrolledStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  progress: {
+    type: Map,
+    of: Number, // progress percentage per studentId
+    default: {}
+  },
+  resources: [
+    {
+      title: String,
+      type: { type: String, enum: ['PDF', 'Video', 'Link'], default: 'PDF' },
+      url: String
+    }
+  ]
+}, { timestamps: true });
+
+module.exports = mongoose.model('Course', courseSchema);
+>>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10
