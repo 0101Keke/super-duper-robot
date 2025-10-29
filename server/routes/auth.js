@@ -6,7 +6,7 @@ const User = require('../models/User');
 const auth = require('../middleware/auth'); // <-- JWT middleware (sets req.user = { id, role })
 
 
-const auth = require('../middleware/auth');
+
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
