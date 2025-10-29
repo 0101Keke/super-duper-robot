@@ -1,16 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-<<<<<<< HEAD
 // Main authentication middleware
 const auth = function (req, res, next) {
     // Get token from header
     const token = req.header('x-auth-token');
-=======
-module.exports = function (req, res, next) {
-  const authHeader = req.header('Authorization');
-  let token = null;
->>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10
 
   // Accept either Bearer token or x-auth-token
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -19,7 +13,6 @@ module.exports = function (req, res, next) {
     token = req.header('x-auth-token');
   }
 
-<<<<<<< HEAD
     // Verify token
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
@@ -73,18 +66,3 @@ const isTutor = async (req, res, next) => {
 module.exports = auth;  
 module.exports.isAdmin = isAdmin;
 module.exports.isTutor = isTutor;
-=======
-  if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    req.user = decoded.user;
-    next();
-  } catch (err) {
-    console.error('Token verification error:', err.message);
-    res.status(401).json({ msg: 'Token is not valid' });
-  }
-};
->>>>>>> 9438b22f94d925f2ae4224824fd91ef9f7689a10
