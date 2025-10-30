@@ -124,7 +124,7 @@ const Home = () => {
                                         Connect directly with tutors and classmates for personalized help
                                     </p>
                                     {user && (
-                                        <Link to="/Message">
+                                        <Link to="/Messages">
                                             <button className="btn btn-outline-success">
                                                 Start Chatting
                                             </button>
