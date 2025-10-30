@@ -15,18 +15,18 @@ function AssignStudent() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // ✅ Fetch all courses and students directly from backend endpoints
+  // Fetch all courses and students directly from backend endpoints
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token'); // 👈 fetch token manually
+        const token = localStorage.getItem('token'); 
 
         const [coursesRes, studentsRes] = await Promise.all([
           fetch('http://localhost:5000/api/courses', {
-            headers: { Authorization: `Bearer ${token}` }, // 👈 use token
+            headers: { Authorization: `Bearer ${token}` }, 
           }),
           fetch('http://localhost:5000/api/users/students', {
-            headers: { Authorization: `Bearer ${token}` }, // 👈 use token
+            headers: { Authorization: `Bearer ${token}` }, 
           }),
         ]);
 
@@ -49,7 +49,7 @@ function AssignStudent() {
     fetchData();
   }, []);
 
-  // ✅ Handle assigning a student to a course
+  // Handle assigning a student to a course
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -62,13 +62,13 @@ function AssignStudent() {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('token'); // 👈 manually get token again
+      const token = localStorage.getItem('token'); //  manually get token again
 
       const res = await fetch('http://localhost:5000/api/courses/assign', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // ✅ manually attach token
+          Authorization: `Bearer ${token}`, //  manually attach token
         },
         body: JSON.stringify({
           courseId: selectedCourse,
@@ -83,7 +83,7 @@ function AssignStudent() {
         return;
       }
 
-      setSuccess('✅ Student successfully added to course!');
+      setSuccess(' Student successfully added to course!');
       setSelectedCourse('');
       setSelectedStudent('');
 
