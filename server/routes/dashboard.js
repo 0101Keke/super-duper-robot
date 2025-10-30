@@ -1,13 +1,17 @@
 // server/routes/dashboard.js
 const express = require('express');
 const router = express.Router();
+<<<<<<< HEAD
 
 const auth = require('../middleware/auth');          // main auth middleware (sets req.user = { id, role })
 const isAdmin = auth.isAdmin;                        // admin gate
 
+=======
+>>>>>>> home-shiva
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Course = require('../models/Course');
+<<<<<<< HEAD
 const Assignment = require('../models/Assignment');
 const Submission = require('../models/Submission');
 
@@ -15,6 +19,37 @@ const Submission = require('../models/Submission');
  * GET /api/dashboard/student
  * Returns dashboard data for the logged-in student.
  */
+=======
+const auth = require('../middleware/auth');
+const Enrollment = require('../models/Enrollment');
+const Submission = require('../models/Submission');
+const isAdmin = auth.isAdmin;
+
+// GET /api/dashboard/stats
+router.get('/stats', auth, isAdmin, async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalTutors = await User.countDocuments({ role: 'tutor', isApproved: true });
+        const totalStudents = await User.countDocuments({ role: 'student' });
+        const pendingTutors = await User.countDocuments({ role: 'tutor', isApproved: false });
+        const totalCourses = await Course.countDocuments();
+        const activeCourses = await Course.countDocuments({ status: 'active' });
+
+        res.json({
+            totalUsers,
+            totalTutors,
+            totalStudents,
+            pendingTutors,
+            totalCourses,
+            activeCourses
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+        res.status(500).json({ message: 'Error fetching stats', error: error.message });
+    }
+});
+
+>>>>>>> home-shiva
 router.get('/student', auth, async (req, res) => {
   try {
     // Enrolled courses from User.courses (expects courses: [ObjectId] with ref 'Course')
@@ -84,5 +119,9 @@ router.get('/stats', auth, isAdmin, async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 module.exports = router;
 
+=======
+module.exports = router;
+>>>>>>> home-shiva

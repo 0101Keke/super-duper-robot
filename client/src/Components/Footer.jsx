@@ -11,42 +11,15 @@ function Footer() {
             <div className="container">
                 <div className="row">
                     {/* Column 1: About */}
-                    <div className="col-md-3 mb-3">
+                    <div className="col-md-4 mb-3">
                         <h5 className="text-white fw-bold mb-3">CampusLearn</h5>
                         <p className="text-white-50 small">
                             Your collaborative learning platform for academic success.
                         </p>
                     </div>
 
-                    {/* Column 2: Quick Links */}
-                    <div className="col-md-3 mb-3">
-                        <h6 className="text-white fw-bold mb-3">Quick Links</h6>
-                        <ul className="list-unstyled">
-                            <li className="mb-2">
-                                <Link to="/" className="text-white-50 text-decoration-none">
-                                    Home
-                                </Link>
-                            </li>
-                            <li className="mb-2">
-                                <Link to="/Discussion" className="text-white-50 text-decoration-none">
-                                    Discussions
-                                </Link>
-                            </li>
-                            <li className="mb-2">
-                                <Link to="/Resource" className="text-white-50 text-decoration-none">
-                                    Resources
-                                </Link>
-                            </li>
-                            <li className="mb-2">
-                                <Link to="/Contact" className="text-white-50 text-decoration-none">
-                                    Contact
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Column 3: Support */}
-                    <div className="col-md-3 mb-3">
+                    {/* Column 2: Support */}
+                    <div className="col-md-4 mb-3">
                         <h6 className="text-white fw-bold mb-3">Support</h6>
                         <ul className="list-unstyled">
                             <li className="mb-2">
@@ -73,8 +46,8 @@ function Footer() {
                         </ul>
                     </div>
 
-                    {/* Column 4: Contact */}
-                    <div className="col-md-3 mb-3">
+                    {/* Column 3: Contact */}
+                    <div className="col-md-4 mb-3">
                         <h6 className="text-white fw-bold mb-3">Get in Touch</h6>
                         <p className="text-white-50 small mb-2">
                             <i className="bi bi-envelope me-2"></i>
