@@ -1,10 +1,8 @@
 // server/routes/dashboard.js
 const express = require('express');
 const router = express.Router();
-
 const auth = require('../middleware/auth');          // main auth middleware (sets req.user = { id, role })
 const isAdmin = auth.isAdmin;                        // admin gate
-
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Course = require('../models/Course');
@@ -15,6 +13,7 @@ const Submission = require('../models/Submission');
  * GET /api/dashboard/student
  * Returns dashboard data for the logged-in student.
  */
+
 router.get('/student', auth, async (req, res) => {
   try {
     // Enrolled courses from User.courses (expects courses: [ObjectId] with ref 'Course')
@@ -84,5 +83,5 @@ router.get('/stats', auth, isAdmin, async (req, res) => {
   }
 });
 
-module.exports = router;
 
+module.exports = router;

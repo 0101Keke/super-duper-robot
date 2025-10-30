@@ -4,6 +4,7 @@ const User = require('../models/User');
 
 // Main authentication middleware
 const auth = (req, res, next) => {
+
   // Accept either Authorization: Bearer <token> or x-auth-token
   const authHeader = req.headers.authorization || '';
   let token = null;

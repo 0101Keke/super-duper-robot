@@ -37,16 +37,15 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/topics', require('./routes/topics'));
 app.use('/api/resources', resourceRoutes);
 app.use('/api/chatbot', require('./routes/chatbot'));
-app.use('/api/student', studentRoutes);
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/enrollments', require('./routes/enrollment'));
+app.use('/api/submissions', require('./routes/submission'));
 app.use('/api/courses', courseRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/discussions', discussionRoutes);
-app.use('/api/profile', profileRoutes);
 app.use('/api/users', usersRouter);
 app.use('/api/dashboard', require('./routes/dashboard'));
-app.use('/api/enrollments', require('./routes/enrollment'));
-app.use('/api/submissions', require('./routes/submission'));
-app.use('/api/admin', require('./routes/admin')); // Optional admin route
+app.use("/api/messages", require("./routes/messages"));
 
 // ✅ Test route
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
