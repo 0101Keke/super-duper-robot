@@ -51,4 +51,15 @@ router.put("/profile", auth, upload.single("profilePicture"), async (req, res) =
   }
 });
 
+router.get('/students', async (req, res) => {
+  try {
+    const students = await User.find({ role: 'student' }).select('fullName email');
+    res.json(students);
+  } catch (err) {
+    console.error('Fetch students error:', err);
+    res.status(500).json({ message: 'Server error fetching students' });
+  }
+});
+
+
 module.exports = router;
