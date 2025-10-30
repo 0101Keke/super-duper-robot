@@ -5,6 +5,17 @@ const User = require('../models/User');
 const Course = require('../models/Course'); // Create this model if missing
 const student = require('../models/Student');
 
+// Get all courses
+router.get('/', async (req, res) => {
+  try {
+    const courses = await Course.find();
+    res.json(courses);
+  } catch (err) {
+    console.error('Error fetching courses:', err);
+    res.status(500).json({ message: 'Server error fetching all courses' });
+  }
+});
+
 // Get all enrolled courses for logged-in student
 router.get('/enrolled', auth, async (req, res) => {
   try {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
+import { useNavigate } from 'react-router-dom';
 
 function TutorDash() {
   const [stats, setStats] = useState({
@@ -11,6 +12,7 @@ function TutorDash() {
 
   const [courses, setCourses] = useState([]);
   const [submissions, setSubmissions] = useState([]);
+  const navigate = useNavigate();
 
   // Simulated data load
   /*useEffect(() => {
@@ -87,6 +89,9 @@ function TutorDash() {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="fw-bold">Tutor Dashboard</h1>
           <button className="btn btn-dark">+ New Course</button>
+          <button className="btn btn-success me-2" onClick={() => navigate('/courses')}>
+                                    Assign Courses
+                                </button>
         </div>
 
         {/* DASHBOARD STATS */}

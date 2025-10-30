@@ -6,6 +6,17 @@ const fs = require('fs');
 const Course = require('../models/Course');
 const auth = require('../middleware/auth');
 
+// Get all resources
+router.get('/', async (req, res) => {
+  try {
+    const resources = await Resources.find();
+    res.json(resources);
+  } catch (err) {
+    console.error('Error fetching resources:', err);
+    res.status(500).json({ message: 'Server error fetching resources' });
+  }
+});
+
 // Upload folder
 const resourceDir = path.join(__dirname, '..', 'uploads', 'resources');
 if (!fs.existsSync(resourceDir)) fs.mkdirSync(resourceDir, { recursive: true });
