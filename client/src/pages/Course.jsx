@@ -19,9 +19,15 @@ function AssignStudent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('token'); // 👈 fetch token manually
+
         const [coursesRes, studentsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/courses'),
-          fetch('http://localhost:5000/api/users/students'), // ✅ fixed endpoint
+          fetch('http://localhost:5000/api/courses', {
+            headers: { Authorization: `Bearer ${token}` }, // 👈 use token
+          }),
+          fetch('http://localhost:5000/api/users/students', {
+            headers: { Authorization: `Bearer ${token}` }, // 👈 use token
+          }),
         ]);
 
         if (!coursesRes.ok || !studentsRes.ok)
@@ -56,9 +62,14 @@ function AssignStudent() {
 
     try {
       setLoading(true);
+      const token = localStorage.getItem('token'); // 👈 manually get token again
+
       const res = await fetch('http://localhost:5000/api/courses/assign', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // ✅ manually attach token
+        },
         body: JSON.stringify({
           courseId: selectedCourse,
           studentId: selectedStudent,

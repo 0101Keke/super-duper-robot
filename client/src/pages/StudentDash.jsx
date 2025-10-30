@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav.jsx';
 import API from '../api'; // make sure API has axios with baseURL /api
+
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
