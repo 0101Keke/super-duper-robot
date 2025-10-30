@@ -17,18 +17,22 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// POST /resources/upload/:courseId
+// 📤 Upload a resource (Tutor only)
 router.post('/upload/:courseId', auth, upload.single('file'), async (req, res) => {
   try {
     const course = await Course.findById(req.params.courseId);
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
     const resource = {
       name: req.file.originalname,
-      type: path.extname(req.file.originalname).replace('.', ''),
-      url: `/uploads/resources/${req.file.filename}`
+      type: path.extname(req.file.originalname).replace('.', '').toUpperCase(),
+      url: `/uploads/resources/${req.file.filename}`,
+      uploadedAt: new Date()
     };
 
+    course.resources = course.resources || [];
     course.resources.push(resource);
     await course.save();
 
@@ -39,12 +43,16 @@ router.post('/upload/:courseId', auth, upload.single('file'), async (req, res) =
   }
 });
 
-// GET /resources/:courseId
+// 📚 Get all resources for a course
 router.get('/:courseId', auth, async (req, res) => {
   try {
-    const course = await Course.findById(req.params.courseId).select('resources');
+    const course = await Course.findById(req.params.courseId).select('resources title');
     if (!course) return res.status(404).json({ message: 'Course not found' });
-    res.json(course.resources);
+
+    res.json({
+      courseTitle: course.title,
+      resources: course.resources || []
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

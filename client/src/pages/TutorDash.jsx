@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';  // ✅ Import navigate
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 
@@ -11,10 +12,11 @@ function TutorDash() {
 
   const [courses, setCourses] = useState([]);
   const [submissions, setSubmissions] = useState([]);
+  const navigate = useNavigate(); // ✅ Initialize navigation
 
   // Simulated data load
   useEffect(() => {
-    // You can replace this with API calls later
+    // Replace with real API later
     setTimeout(() => {
       setStats({
         totalStudents: 42,
@@ -43,7 +45,20 @@ function TutorDash() {
       <div className="container py-4 flex-grow-1">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="fw-bold">Tutor Dashboard</h1>
-          <button className="btn btn-dark">+ New Course</button>
+          <div>
+            <button
+              className="btn btn-dark me-2"
+              onClick={() => navigate('/new-course')}
+            >
+              + New Course
+            </button>
+            <button
+              className="btn btn-outline-dark"
+              onClick={() => navigate('/tutor-resources')} // ✅ Added navigation to upload page
+            >
+              Manage Resources
+            </button>
+          </div>
         </div>
 
         {/* DASHBOARD STATS */}
@@ -88,7 +103,12 @@ function TutorDash() {
                     <p className="text-muted mb-2">
                       {course.students} enrolled students
                     </p>
-                    <button className="btn btn-outline-dark btn-sm">Manage</button>
+                    <button
+                      className="btn btn-outline-dark btn-sm"
+                      onClick={() => navigate(`/courses/${course.id}`)}
+                    >
+                      Manage
+                    </button>
                   </div>
                 </div>
               </div>
