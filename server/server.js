@@ -11,6 +11,7 @@ const discussionRoutes = require('./routes/discussion');
 const profileRoutes = require('./routes/profile');
 const usersRouter = require("./routes/users");
 const path = require('path');
+const tutordashroutes = require('./routes/tutordash');
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/discussions', discussionRoutes);
 app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/tutordash', tutordashroutes);
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 

@@ -13,7 +13,7 @@ function TutorDash() {
   const [submissions, setSubmissions] = useState([]);
 
   // Simulated data load
-  useEffect(() => {
+  /*useEffect(() => {
     // You can replace this with API calls later
     setTimeout(() => {
       setStats({
@@ -34,7 +34,50 @@ function TutorDash() {
         { id: 3, student: 'Nina P', course: 'Database Design', date: '2025-10-22', status: 'Pending' },
       ]);
     }, 500);
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+  const tutorId = localStorage.getItem("tutorId"); // or from auth context
+  const API_BASE = "http://localhost:5000/api/tutors";
+
+  async function loadDashboard() {
+    try {
+      // Fetch stats
+      const statsRes = await fetch(`${API_BASE}/${tutorId}/stats`);
+      const statsData = await statsRes.json();
+
+      // Fetch courses
+      const coursesRes = await fetch(`${API_BASE}/${tutorId}/courses`);
+      const coursesData = await coursesRes.json();
+
+      // Fetch recent submissions
+      const subsRes = await fetch(`${API_BASE}/${tutorId}/submissions/recent`);
+      const subsData = await subsRes.json();
+
+      setStats({
+        totalStudents: statsData.totalStudents,
+        totalCourses: statsData.totalCourses,
+        pendingReviews: statsData.pendingReviews,
+      });
+
+      setCourses(coursesData);
+      setSubmissions(
+        subsData.map((s) => ({
+          id: s._id,
+          student: s.studentId?.name || "Unknown",
+          course: s.courseId?.title || "N/A",
+          date: new Date(s.date).toLocaleDateString(),
+          status: s.status,
+        }))
+      );
+    } catch (err) {
+      console.error("Error loading dashboard:", err);
+    }
+  }
+
+  loadDashboard();
+}, []);
+
 
   return (
     <div className="d-flex flex-column min-vh-100">
