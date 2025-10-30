@@ -30,7 +30,7 @@ import StudentSubmissions from './pages/StudentSubmissions.jsx';
 import ManageTutors from './pages/ManageTutors';// create if missing
 import Discussions from './pages/Discussions';
 import DiscussionDetail from './pages/DiscussionDetail';
-
+import TutorResources from "./pages/TutorResources.jsx"; 
 
 function App() {
     return (
@@ -64,6 +64,7 @@ function App() {
             <Route path="/discussions" element={<Discussions />} />
             <Route path="/discussions/:id" element={<DiscussionDetail />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/tutor-resources" element={<TutorResources />} />
         </Routes>
     );
 }
