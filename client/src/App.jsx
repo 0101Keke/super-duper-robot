@@ -16,7 +16,7 @@ import Admin from './pages/Admin.jsx';
 import AdminReg from './pages/AdminReg.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import Profile from './pages/Profile.jsx';
-import Messages from './pages/Message.jsx';
+import Messages from './pages/Messages.jsx';
 import ThankYou from './pages/ThankYou.jsx';
 import AdminLogin from './pages/AdminLogin.jsx';
 import Resource from './pages/Resource.jsx';
@@ -28,6 +28,8 @@ import MyCourses from './pages/MyCourses.jsx';
 import Assignments from './pages/Assignments.jsx'
 import StudentSubmissions from './pages/StudentSubmissions.jsx';
 import ManageTutors from './pages/ManageTutors';// create if missing
+import Discussions from './pages/Discussions';
+import DiscussionDetail from './pages/DiscussionDetail';
 
 
 function App() {
@@ -48,7 +50,6 @@ function App() {
             <Route path="/AdminReg" element={<AdminReg />} /> 
             <Route path="/Forgot" element={<ForgotPassword />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/Message" element={<Messages />} />
             <Route path="/ThankYou" element={<ThankYou />} />
             <Route path="/AdminLogin" element={<AdminLogin />} />
             <Route path="/resource" element={<Resource />} />
@@ -60,6 +61,9 @@ function App() {
             <Route path="/courses/:courseId/assignments" element={<Assignments />} />
             <Route path="/student/my-submissions" element={<StudentSubmissions />} />
             <Route path='/admin/manage-tutors' element={<ManageTutors />} />
+            <Route path="/discussions" element={<Discussions />} />
+            <Route path="/discussions/:id" element={<DiscussionDetail />} />
+            <Route path="/messages" element={<Messages />} />
         </Routes>
     );
 }

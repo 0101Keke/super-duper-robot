@@ -1,47 +1,53 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Discussion = require('../models/Discussion');
-const auth = require('../middleware/auth');
+const Discussion = require("../models/Discussion");
 
-// Create a discussion topic
-router.post('/:courseId', auth, async (req, res) => {
+// Create new discussion
+router.post("/", async (req, res) => {
   try {
-    const { title, content } = req.body;
-    const discussion = new Discussion({
-      course: req.params.courseId,
-      title,
-      content,
-      author: req.user.id
-    });
-    await discussion.save();
-    res.json(discussion);
+    const { title, content, author } = req.body;
+    const newDiscussion = new Discussion({ title, content, author });
+    await newDiscussion.save();
+    res.status(201).json(newDiscussion);
   } catch (err) {
-    res.status(500).json({ message: 'Error creating discussion', error: err.message });
+    res.status(500).json({ message: "Error creating discussion", error: err.message });
   }
 });
 
-// Get discussions for a course
-router.get('/:courseId', auth, async (req, res) => {
+// Get all discussions
+router.get("/", async (req, res) => {
   try {
-    const discussions = await Discussion.find({ course: req.params.courseId }).populate('author', 'fullName');
+    const discussions = await Discussion.find()
+      .populate("author", "name email")
+      .sort({ createdAt: -1 });
     res.json(discussions);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching discussions' });
+    res.status(500).json({ message: "Error fetching discussions", error: err.message });
   }
 });
 
-// Add comment
-router.post('/:discussionId/comment', auth, async (req, res) => {
+// Get single discussion + replies
+router.get("/:id", async (req, res) => {
   try {
-    const discussion = await Discussion.findById(req.params.discussionId);
-    discussion.comments.push({
-      author: req.user.id,
-      content: req.body.content
-    });
-    await discussion.save();
+    const discussion = await Discussion.findById(req.params.id)
+      .populate("author", "name email")
+      .populate("replies.author", "name email");
     res.json(discussion);
   } catch (err) {
-    res.status(500).json({ message: 'Error adding comment' });
+    res.status(500).json({ message: "Error fetching discussion", error: err.message });
+  }
+});
+
+// Add reply
+router.post("/:id/reply", async (req, res) => {
+  try {
+    const { content, author } = req.body;
+    const discussion = await Discussion.findById(req.params.id);
+    discussion.replies.push({ content, author });
+    await discussion.save();
+    res.status(201).json(discussion);
+  } catch (err) {
+    res.status(500).json({ message: "Error adding reply", error: err.message });
   }
 });
 
