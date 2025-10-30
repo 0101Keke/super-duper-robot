@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header.jsx';
-import Footer from '../components/Footer.jsx';
+import Header from '../Components/StudentNav.jsx';
+import Footer from '../Components/Footer.jsx';
 import API, { coursesAPI } from '../api';
 
 function Courses() {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import Nav from '../components/Nav.jsx';
+import StudentNav from '../Components/StudentNav.jsx';
+import Footer from '../Components/Footer.jsx';
 import API from '../api'; // make sure API has axios with baseURL /api
 const Dashboard = () => {
     const { user, logout } = useAuth();
@@ -93,11 +94,8 @@ const Dashboard = () => {
     return (
         <div className="min-vh-100 bg-light">
             {/* Top Navigation */}
-            <nav className="navbar navbar-expand-lg navbar-dark bg-green shadow-sm">
-                <div className="container-fluid">
-                    <Nav/>
-                </div>
-            </nav>
+            
+            <StudentNav />
 
             <div className="container-fluid py-4">
                 {/* Header Section */}
@@ -477,12 +475,15 @@ const Dashboard = () => {
                                 <p className="card-text">
                                     "Take regular breaks using the Pomodoro Technique: 25 minutes of focused study, followed by a 5-minute break."
                                 </p>
+                                
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
+        
     );
 };
 
