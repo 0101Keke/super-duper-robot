@@ -80,4 +80,4 @@ faqSchema.methods.updateAnswer = async function (newAnswer, updatedBy = null) {
     }
 
     this.answer = newAnswer.trim();
-    
+};

@@ -12,7 +12,12 @@ const discussionSchema = new mongoose.Schema({
   content: String,
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   comments: [commentSchema],
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+   replies: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    content: String,
+    createdAt: { type: Date, default: Date.now }
+  }]
 });
 
 module.exports = mongoose.model('Discussion', discussionSchema);

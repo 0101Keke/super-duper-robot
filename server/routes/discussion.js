@@ -45,4 +45,12 @@ router.post('/:discussionId/comment', auth, async (req, res) => {
   }
 });
 
+//replies in discussion
+router.post('/:discussionId/reply', async (req, res) => {
+  const discussion = await Discussion.findById(req.params.discussionId);
+  discussion.replies.push({ userId: req.body.userId, content: req.body.content });
+  await discussion.save();
+  res.json(discussion);
+});
+
 module.exports = router;
