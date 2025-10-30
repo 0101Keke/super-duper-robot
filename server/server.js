@@ -43,8 +43,6 @@ app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-//app.use('/api/courses', require('./routes/courses'));
-app.use('/api/users', require('./routes/users'));
 
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
