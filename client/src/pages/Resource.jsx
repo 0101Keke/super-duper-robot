@@ -39,7 +39,13 @@ function Resources() {
       const response = await fetch('http://localhost:5000/api/resources', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newName, url: newUrl }),
+        body: JSON.stringify({
+          title: newName,
+          type: 'OTHER',
+          tutorId: '000000000000000000000000', // Replace with actual tutor ID from auth
+          topicId: '000000000000000000000000', // Replace with actual topic ID
+          url: newUrl
+        }),
       });
 
       const result = await response.json();

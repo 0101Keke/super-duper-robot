@@ -4,7 +4,19 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Course = require('../models/Course');
+const Resources = require('../models/Resources');
 const auth = require('../middleware/auth');
+
+// Get all resources
+router.get('/', async (req, res) => {
+  try {
+    const resources = await Resources.find();
+    res.json(resources);
+  } catch (err) {
+    console.error('Error fetching resources:', err);
+    res.status(500).json({ message: 'Server error fetching resources' });
+  }
+});
 
 // Upload folder
 const resourceDir = path.join(__dirname, '..', 'uploads', 'resources');
@@ -17,20 +29,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// POST /resources/upload/:courseId
-router.post('/upload/:courseId', auth, upload.single('file'), async (req, res) => {
+// POST /resources - Create a new resource
+router.post('/', auth, async (req, res) => {
   try {
-    const course = await Course.findById(req.params.courseId);
-    if (!course) return res.status(404).json({ message: 'Course not found' });
+    const { title, type = 'OTHER', tutorId, topicId } = req.body;
+    
+    const resource = new Resources({
+      title,
+      type,
+      filePath: req.body.url, // Using url as filePath for now
+      tutorId,
+      topicId
+    });
 
-    const resource = {
-      name: req.file.originalname,
-      type: path.extname(req.file.originalname).replace('.', ''),
-      url: `/uploads/resources/${req.file.filename}`
-    };
-
-    course.resources.push(resource);
-    await course.save();
+    await resource.save();
 
     res.json({ message: 'Resource uploaded successfully', resource });
   } catch (err) {
