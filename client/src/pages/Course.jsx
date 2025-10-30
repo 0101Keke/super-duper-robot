@@ -15,13 +15,19 @@ function AssignStudent() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // ✅ Fetch all courses and students directly from backend endpoints
+  // Fetch all courses and students directly from backend endpoints
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('token'); 
+
         const [coursesRes, studentsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/courses'),
-          //fetch('http://localhost:5000/api/students'),
+          fetch('http://localhost:5000/api/courses', {
+            headers: { Authorization: `Bearer ${token}` }, 
+          }),
+          fetch('http://localhost:5000/api/users/students', {
+            headers: { Authorization: `Bearer ${token}` }, 
+          }),
         ]);
 
         if (!coursesRes.ok || !studentsRes.ok)
@@ -43,7 +49,7 @@ function AssignStudent() {
     fetchData();
   }, []);
 
-  // ✅ Handle assigning a student to a course
+  // Handle assigning a student to a course
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -56,23 +62,28 @@ function AssignStudent() {
 
     try {
       setLoading(true);
+      const token = localStorage.getItem('token'); //  manually get token again
+
       const res = await fetch('http://localhost:5000/api/courses/assign', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, //  manually attach token
+        },
         body: JSON.stringify({
           courseId: selectedCourse,
           studentId: selectedStudent,
         }),
       });
 
-      if (res.status === 409) {
-        setError('This student is already assigned to that course.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'Failed to assign student.');
         return;
       }
 
-      if (!res.ok) throw new Error('Failed to assign student.');
-
-      setSuccess('Student successfully added to course!');
+      setSuccess(' Student successfully added to course!');
       setSelectedCourse('');
       setSelectedStudent('');
 
@@ -120,7 +131,7 @@ function AssignStudent() {
                   <option value="">-- Choose a course --</option>
                   {courses.map((course) => (
                     <option key={course._id} value={course._id}>
-                      {course.title}
+                      {course.title || course.name}
                     </option>
                   ))}
                 </select>
@@ -138,7 +149,7 @@ function AssignStudent() {
                   <option value="">-- Choose a student --</option>
                   {students.map((student) => (
                     <option key={student._id} value={student._id}>
-                      {student.fullName} ({student.email})
+                      {student.fullName || student.name} ({student.email})
                     </option>
                   ))}
                 </select>
