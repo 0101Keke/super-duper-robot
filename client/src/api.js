@@ -92,6 +92,10 @@ export const coursesAPI = {
     getMyCourses: () => API.get('/courses/my/courses')
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev-themba
 
 
 export default API;

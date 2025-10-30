@@ -96,7 +96,13 @@ const courseSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-
+    code: {
+        type: String,
+        required: true,
+        unique: true, 
+        trim: true,
+        uppercase: true 
+    },
     // Media
     thumbnail: {
         type: String, // URL or path to image
@@ -120,6 +126,7 @@ const courseSchema = new mongoose.Schema({
         topic: String,
         description: String
     }]
+
 }, {
     timestamps: true,
     collection: 'courses'

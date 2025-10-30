@@ -122,5 +122,138 @@ router.get('/reports', [auth, isAdmin], async (req, res) => {
         res.status(500).json({ message: 'Error fetching reports' });
     }
 });
+router.get('/users/all', [auth, isAdmin], async (req, res) => {
+    try {
+        const users = await User.find()
+            .sort({ createdAt: -1 })
+            .select('-password');
+
+        res.json(users);
+    } catch (error) {
+        console.error('Get all users error:', error);
+        res.status(500).json({ message: 'Error fetching all users' });
+    }
+
+});
+        router.delete('/users/:id', [auth, isAdmin], async (req, res) => {
+            try {
+                const user = await User.findById(req.params.id);
+
+                if (!user) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+
+                // Prevent admin from deleting their own account
+                if (user._id.toString() === req.user.id) {
+                    return res.status(400).json({ message: 'You cannot delete your own account.' });
+                }
+
+                await User.findByIdAndDelete(req.params.id);
+
+                res.json({ message: 'User deleted successfully' });
+            } catch (error) {
+                console.error('Delete user error:', error);
+                res.status(500).json({ message: 'Error deleting user' });
+            }
+        });
+
+        // @route   PUT /api/admin/users/:id/status
+        // @desc    Update a user's status (ban/unban)
+        // @access  Private (Admin only)
+        router.put('/users/:id/status', [auth, isAdmin], async (req, res) => {
+            try {
+                const { status } = req.body;
+
+                if (status !== 'active' && status !== 'banned') {
+                    return res.status(400).json({ message: 'Invalid status.' });
+                }
+
+                const user = await User.findById(req.params.id);
+
+                if (!user) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+
+                // Prevent admin from banning themself
+                if (user._id.toString() === req.user.id) {
+                    return res.status(400).json({ message: 'You cannot change your own status.' });
+                }
+
+                user.status = status;
+                await user.save();
+
+                res.json({ message: 'User status updated successfully', user });
+            } catch (error) {
+                console.error('Update user status error:', error);
+                res.status(500).json({ message: 'Error updating user status' });
+            }
+        });
+   
+router.get('/tutors', [auth, isAdmin], async (req, res) => {
+    try {
+        const tutors = await User.find({ role: 'tutor', isApproved: true })
+            .select('fullName username _id'); // Only send necessary info
+        res.json(tutors);
+    } catch (error) {
+        console.error('Get tutors error:', error);
+        res.status(500).json({ message: 'Error fetching tutors' });
+    }
+});
+
+
+// @route   POST /api/admin/courses
+// @desc    Create a new course
+// @access  Private (Admin only)
+router.post('/courses', [auth, isAdmin], async (req, res) => {
+    try {
+        const {
+            title,
+            description,
+            subject,
+            level,
+            tutor, // This will be the tutor's ID from the form
+            price,
+            duration,
+            code,
+            startDate,
+            endDate
+        } = req.body;
+
+        // Validation
+        if (!title || !description || !subject || !level || !tutor || !duration || !startDate || !endDate) {
+            return res.status(400).json({ message: 'Please fill out all required fields.' });
+        }
+
+        const newCourse = new Course({
+            title,
+            description,
+            subject,
+            level,
+            tutor, // The ID of the selected tutor
+            price: price || 0, // Use default if price isn't provided
+            duration,
+            code,
+            startDate,
+            endDate,
+            // The model seems to care about the *tutor*, not the admin who created it
+            // So we'll use the 'tutor' field from the request body
+        });
+
+        const course = await newCourse.save();
+        res.status(201).json({ message: 'Course created successfully', course });
+
+    } catch (error) {
+        console.error('Create course error:', error);
+        if (error.name === 'ValidationError') {
+            // Send back specific validation errors
+            return res.status(400).json({ message: error.message });
+        }
+        res.status(500).json({ message: 'Error creating course' });
+    }
+});
+
+
+
+
 
 module.exports = router;

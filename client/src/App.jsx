@@ -23,10 +23,15 @@ import Resource from './pages/Resource.jsx';
 import ModuleCourse from './pages/ModuleCourse.jsx';
 import Topic from './pages/Topic.jsx';
 import Chatbot from './pages/Chatbot.jsx';
+<<<<<<< HEAD
 import Courses from './pages/Courses.jsx'; 
 import MyCourses from './pages/MyCourses.jsx';
 import Assignments from './pages/Assignments.jsx'
 import StudentSubmissions from './pages/StudentSubmissions.jsx';
+=======
+import Courses from './pages/CourseDetail.jsx';
+import ManageTutors from './pages/ManageTutors';// create if missing
+>>>>>>> dev-themba
 
 
 function App() {
@@ -54,10 +59,15 @@ function App() {
             <Route path="/ModuleCourse" element={<ModuleCourse />} />
             <Route path="/Topic" element={<Topic />} />
             <Route path="/chatbot" element={<Chatbot />} />
+<<<<<<< HEAD
             <Route path="/courses" element={<Courses />} /> 
             <Route path="/courses/my-courses" element={<MyCourses />} />
             <Route path="/courses/:courseId/assignments" element={<Assignments />} />
             <Route path="/student/my-submissions" element={<StudentSubmissions />} />
+=======
+            <Route path="/courses" element={<Courses />} />
+            <Route path='/admin/manage-tutors' element={<ManageTutors />} />
+>>>>>>> dev-themba
             
                </Routes>
     );
