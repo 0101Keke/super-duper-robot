@@ -40,7 +40,7 @@ router.get("/:tutorId/submissions/recent", async (req, res) => {
     const submissions = await Submission.find({ tutorId })
       .sort({ date: -1 })
       .limit(5)
-      .populate("studentId", "name")
+      .populate("studentId")
       .populate("courseId", "title");
 
     res.json(submissions);
