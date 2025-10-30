@@ -3,14 +3,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-<<<<<<< HEAD
-const auth = require('../middleware/auth'); // <-- JWT middleware (sets req.user = { id, role })
-
-
-
-=======
 const auth = require('../middleware/auth');
->>>>>>> home-shiva
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -138,10 +131,6 @@ user = new User({
     }
 });
 
-<<<<<<< HEAD
-
-=======
->>>>>>> home-shiva
 
 router.post('/login', async (req, res) => {
   try {

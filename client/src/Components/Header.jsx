@@ -45,9 +45,6 @@ function Header() {
                             <Link to="/AdminLogin">
                                 <button className="btn btn-dark text-white">Admin Login</button>
                             </Link>
-                            <Link to="/StuReg">
-                                <button className="btn btn-dark text-white">Register</button>
-                            </Link>
                         </>
                     ) : (
                         <>
