@@ -82,7 +82,4 @@ export const coursesAPI = {
         })
 };
 
-export const studentsAPI = {
-    getAll: () => API.get('/students'),
-};
 export default API;

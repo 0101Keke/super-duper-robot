@@ -24,8 +24,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Connect to MongoDB
 connectDB(process.env.MONGODB_URI);
@@ -43,6 +42,10 @@ app.use('/api/discussions', discussionRoutes);
 app.use('/api/profile', profileRoutes);
 app.use("/api/users", usersRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+//app.use('/api/courses', require('./routes/courses'));
+app.use('/api/users', require('./routes/users'));
+
 
 app.get('/api/ping', (req, res) => res.json({ pong: true }));
 

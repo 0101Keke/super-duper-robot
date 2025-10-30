@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
+import { coursesAPI, usersAPI } from '../api.js'; // ✅ use centralized API
 
 function AssignStudent() {
   const navigate = useNavigate();
@@ -15,25 +16,20 @@ function AssignStudent() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // ✅ Fetch all courses and students directly from backend endpoints
+  // ✅ Fetch all courses & students
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setFetching(true);
         const [coursesRes, studentsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/courses'),
-          fetch('http://localhost:5000/api/users/students'), // ✅ fixed endpoint
+          coursesAPI.getAll(),
+          usersAPI.getAllStudents()
         ]);
 
-        if (!coursesRes.ok || !studentsRes.ok)
-          throw new Error('Failed to fetch data');
-
-        const coursesData = await coursesRes.json();
-        const studentsData = await studentsRes.json();
-
-        setCourses(coursesData);
-        setStudents(studentsData);
+        setCourses(coursesRes.data || []);
+        setStudents(studentsRes.data || []);
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching data:', err);
         setError('Failed to load courses or students. Please try again later.');
       } finally {
         setFetching(false);
@@ -43,7 +39,7 @@ function AssignStudent() {
     fetchData();
   }, []);
 
-  // ✅ Handle assigning a student to a course
+  // ✅ Assign student to course
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -56,30 +52,19 @@ function AssignStudent() {
 
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/courses/assign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          courseId: selectedCourse,
-          studentId: selectedStudent,
-        }),
-      });
+      const res = await coursesAPI.assignStudent(selectedCourse, selectedStudent);
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || 'Failed to assign student.');
-        return;
+      if (res.status === 200 || res.status === 201) {
+        setSuccess('✅ Student successfully added to course!');
+        setSelectedCourse('');
+        setSelectedStudent('');
+        setTimeout(() => navigate('/tutor-dashboard'), 1500);
+      } else {
+        setError(res.data?.message || 'Failed to assign student.');
       }
-
-      setSuccess('✅ Student successfully added to course!');
-      setSelectedCourse('');
-      setSelectedStudent('');
-
-      setTimeout(() => navigate('/tutor-dashboard'), 1500);
     } catch (err) {
-      console.error(err);
-      setError('Something went wrong while assigning the student.');
+      console.error('Error assigning student:', err);
+      setError(err.response?.data?.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
