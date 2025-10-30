@@ -1,98 +1,163 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import API from '../api';
 import { useAuth } from '../contexts/AuthContext';
 
 const Messages = () => {
-  const { user } = useAuth(); // logged-in user
-  const [recipientId, setRecipientId] = useState('');
+  const { user } = useAuth();
+  const userId = user?.id || user?._id; // ✅ fixed ID handling
+  const [contacts, setContacts] = useState([]);
+  const [search, setSearch] = useState('');
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
-  const [loading, setLoading] = useState(false);
+  const messageEndRef = useRef(null);
 
-  // If you have a list of users, you can render contacts and set recipientId by clicking them.
-  useEffect(() => {}, []);
+  useEffect(() => {
+    fetchContacts();
+  }, []);
 
-  const fetchConversation = async () => {
-    if (!recipientId) {
-      alert('Enter recipient user id (or implement contacts list).');
-      return;
+  useEffect(() => {
+    if (search.trim() === '') {
+      setFilteredContacts(contacts);
+    } else {
+      setFilteredContacts(
+        contacts.filter(c =>
+          c.name?.toLowerCase().includes(search.toLowerCase()) ||
+          c.email?.toLowerCase().includes(search.toLowerCase())
+        )
+      );
     }
-    setLoading(true);
+  }, [search, contacts]);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new message arrives
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const fetchContacts = async () => {
     try {
-      // try API endpoint pattern /messages/:user1/:user2
-      const res = await API.get(`/messages/${user?.id || user?._id}/${recipientId}`);
+      const res = await API.get('/messages/contacts');
+      const others = res.data.filter(u => u._id !== userId);
+      setContacts(others);
+      setFilteredContacts(others);
+    } catch (err) {
+      console.error('Fetch contacts error:', err);
+    }
+  };
+
+  const fetchConversation = async (contact) => {
+    try {
+      setSelectedContact(contact);
+      const res = await API.get(`/messages/${userId}/${contact._id}`);
       setMessages(res.data || []);
     } catch (err) {
       console.error('Fetch conversation error:', err);
-      alert('Could not fetch conversation. Check backend endpoint.');
-    } finally {
-      setLoading(false);
+      setMessages([]);
     }
   };
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!recipientId || !text.trim()) return;
+    if (!selectedContact || !text.trim()) return;
     try {
       const payload = {
-        sender: user?.id || user?._id,
-        receiver: recipientId,
+        sender: userId,
+        receiver: selectedContact._id,
         message: text
       };
       const res = await API.post('/messages', payload);
-      // append locally
       setMessages(prev => [...prev, res.data]);
       setText('');
     } catch (err) {
       console.error('Send message error:', err);
-      alert('Failed to send message.');
     }
   };
 
   return (
     <div className="container py-4">
-      <h2>Messages</h2>
-
-      <div className="card mb-3">
-        <div className="card-body">
-          <label className="form-label">Recipient (user id)</label>
+      <div className="row">
+        {/* Left side - Contacts */}
+        <div className="col-md-4 border-end">
+          <h5 className="mb-3">Contacts</h5>
           <input
-            className="form-control mb-2"
-            placeholder="Enter recipient user id"
-            value={recipientId}
-            onChange={(e) => setRecipientId(e.target.value)}
+            type="text"
+            className="form-control mb-3"
+            placeholder="Search users..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
           />
-          <div>
-            <button className="btn btn-outline-primary me-2" onClick={fetchConversation}>Load Conversation</button>
-          </div>
+          <ul className="list-group" style={{ maxHeight: '450px', overflowY: 'auto' }}>
+            {filteredContacts.length > 0 ? (
+              filteredContacts.map(c => (
+                <li
+                  key={c._id}
+                  className={`list-group-item ${selectedContact?._id === c._id ? 'active' : ''}`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => fetchConversation(c)}
+                >
+                  <strong>{c.name || c.email}</strong><br />
+                  <small className="text-muted">{c.role}</small>
+                </li>
+              ))
+            ) : (
+              <li className="list-group-item text-muted">No users found</li>
+            )}
+          </ul>
         </div>
-      </div>
 
-      <div className="card mb-3" style={{ minHeight: 200 }}>
-        <div className="card-body">
-          {loading ? <p>Loading messages...</p> : (
-            messages.length === 0 ? <p>No messages yet</p> :
-            messages.map(m => (
-              <div key={m._id || `${m.sender}-${m.createdAt}`} className={`mb-2 ${m.sender === (user?.id || user?._id) ? 'text-end' : ''}`}>
-                <div className={`d-inline-block p-2 rounded ${m.sender === (user?.id || user?._id) ? 'bg-success text-white' : 'bg-light'}`}>
-                  <small className="d-block text-muted">{m.sender === (user?.id || user?._id) ? 'You' : m.sender}</small>
-                  <div>{m.message}</div>
-                  <small className="d-block text-muted">{new Date(m.createdAt).toLocaleString()}</small>
-                </div>
+        {/* Right side - Messages */}
+        <div className="col-md-8">
+          {selectedContact ? (
+            <>
+              <h5 className="mb-3">Chat with {selectedContact.name || selectedContact.email}</h5>
+              <div
+                className="border p-3 mb-3 bg-light rounded"
+                style={{ height: '400px', overflowY: 'auto' }}
+              >
+                {messages.length === 0 && (
+                  <p className="text-muted">No messages yet. Start the conversation!</p>
+                )}
+                {messages.map(m => (
+                  <div
+                    key={m._id}
+                    className={`mb-2 ${m.sender === userId ? 'text-end' : 'text-start'}`}
+                  >
+                    <div
+                      className={`d-inline-block p-2 rounded ${
+                        m.sender === userId ? 'bg-primary text-white' : 'bg-white'
+                      }`}
+                    >
+                      <div>{m.message}</div>
+                      <small className="d-block text-muted" style={{ fontSize: '0.8em' }}>
+                        {new Date(m.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </small>
+                    </div>
+                  </div>
+                ))}
+                <div ref={messageEndRef} />
               </div>
-            ))
+
+              <form onSubmit={handleSend} className="d-flex">
+                <input
+                  className="form-control me-2"
+                  placeholder="Type a message..."
+                  value={text}
+                  onChange={e => setText(e.target.value)}
+                />
+                <button className="btn btn-success" type="submit">Send</button>
+              </form>
+            </>
+          ) : (
+            <div className="text-muted text-center mt-5">
+              <p>Select a contact to start chatting.</p>
+            </div>
           )}
         </div>
       </div>
-
-      <form onSubmit={handleSend}>
-        <div className="mb-2">
-          <textarea className="form-control" rows="2" placeholder="Write a message..." value={text} onChange={(e) => setText(e.target.value)} required />
-        </div>
-        <div>
-          <button className="btn btn-primary" type="submit" disabled={!recipientId}>Send</button>
-        </div>
-      </form>
     </div>
   );
 };
