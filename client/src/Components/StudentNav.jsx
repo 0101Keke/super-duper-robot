@@ -17,7 +17,7 @@ export default function StudentNav() {
       <div className="container-fluid d-flex justify-content-between align-items-center">
         {/* Left: Logo + Brand (matches Header exactly) */}
         <div className="d-flex align-items-center">
-          <Link to="/" className="text-decoration-none">
+          <Link to="/student" className="text-decoration-none">
             <img
               src={CLlogo}
               alt="CampusLearn Logo"
@@ -41,12 +41,7 @@ export default function StudentNav() {
 
         {/* Right: Search + Profile/Logout (same look as Header) */}
         <div className="d-flex align-items-center gap-2">
-          <input
-            type="text"
-            className="form-control form-control-sm"
-            placeholder="Search..."
-            style={{ width: "150px" }}
-          />
+          
           {user ? (
             <>
               <Link to="/profile">

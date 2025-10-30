@@ -1,15 +1,143 @@
 // client/src/pages/StudentDash.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import StudentNav from '../Components/StudentNav.jsx';
 import Footer from '../Components/Footer.jsx';
-import API from '../api'; // axios instance with baseURL /api
+import API from '../api';
+
+/* ====================== Calendar (compact) ====================== */
+function CalendarBlock() {
+  const [cursor, setCursor] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
+
+  const today = new Date();
+  const isToday = (y, m, d) =>
+    today.getFullYear() === y &&
+    today.getMonth() === m &&
+    today.getDate() === d;
+
+  const data = useMemo(() => {
+    const y = cursor.getFullYear();
+    const m = cursor.getMonth();
+    const first = new Date(y, m, 1);
+    const lastDate = new Date(y, m + 1, 0).getDate();
+
+    // Monday-first
+    const jsDow = first.getDay(); // 0=Sun..6=Sat
+    const leading = (jsDow + 6) % 7;
+
+    const cells = [];
+    for (let i = 0; i < leading; i++) cells.push({ type: 'blank' });
+    for (let d = 1; d <= lastDate; d++) {
+      cells.push({ type: 'day', day: d, today: isToday(y, m, d) });
+    }
+    const trailing = (7 - (cells.length % 7)) % 7;
+    for (let i = 0; i < trailing; i++) cells.push({ type: 'blank' });
+
+    return {
+      label: cursor.toLocaleString(undefined, { month: 'long', year: 'numeric' }),
+      cells,
+      y,
+      m,
+    };
+  }, [cursor]);
+
+  const prevMonth = () =>
+    setCursor(d => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  const nextMonth = () =>
+    setCursor(d => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  return (
+    <div className="card border-0 shadow-sm mb-4">
+      <div className="card-header bg-white border-0 py-2">
+        <div className="d-flex align-items-center justify-content-center position-relative">
+          <button
+            className="btn btn-sm btn-outline-secondary position-absolute start-0"
+            onClick={prevMonth}
+            aria-label="Previous month"
+          >
+            ‹
+          </button>
+          <div className="fw-semibold">{data.label}</div>
+          <button
+            className="btn btn-sm btn-outline-secondary position-absolute end-0"
+            onClick={nextMonth}
+            aria-label="Next month"
+          >
+            ›
+          </button>
+        </div>
+      </div>
+
+      <div className="px-3">
+        <div className="d-grid" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          {dayNames.map((n) => (
+            <div key={n} className="text-center fw-semibold text-muted small py-1">{n}</div>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-3 pb-3">
+        <div className="border rounded">
+          <div
+            className="d-grid"
+            style={{
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              gridAutoRows: 'minmax(100px, 1fr)'
+            }}
+          >
+            {data.cells.map((cell, idx) => {
+              if (cell.type === 'blank') {
+                return (
+                  <div
+                    key={`b-${idx}`}
+                    className="border-end border-bottom bg-body-tertiary"
+                    style={{ minHeight: 100 }}
+                  />
+                );
+              }
+              return (
+                <div key={`d-${idx}`} className="border-end border-bottom">
+                  <div className="p-2 h-100 d-flex flex-column">
+                    <div className="d-flex">
+                      <span
+                        className={
+                          'small ms-auto rounded px-2 py-1 ' +
+                          (cell.today ? 'bg-primary text-white' : 'text-muted')
+                        }
+                        style={{ minWidth: 28, textAlign: 'center' }}
+                      >
+                        {cell.day}
+                      </span>
+                    </div>
+                    <div className="mt-1 d-flex gap-1 flex-column" style={{ minHeight: 36 }}>
+                      {/* events go here later */}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+/* ==================== /Calendar (compact) ==================== */
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // keep raw stats for study time fallback
+  const [rawStats, setRawStats] = useState({ studyHours: 0 });
+
+  // derived stats for tiles
   const [stats, setStats] = useState({
     enrolledCourses: 0,
     inProgress: 0,
@@ -17,7 +145,7 @@ const Dashboard = () => {
     totalHours: 0
   });
 
-  const [courses, setCourses] = useState([]); // will hold ENROLLED courses for "Continue Learning"
+  const [courses, setCourses] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [studyStreak, setStudyStreak] = useState(0);
@@ -30,49 +158,60 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Get dashboard stats + student's enrolled courses in parallel
       const [dashRes, enrollRes] = await Promise.all([
         API.get('/dashboard/student'),
-        API.get('/enrollments/my') // <-- enrolled courses for the logged-in student
+        API.get('/enrollments/my')
       ]);
 
-      const data = dashRes.data || {};
+      const dash = dashRes?.data || {};
+      setRawStats({ studyHours: dash.studyHours || 0 });
 
-      setStats({
-        enrolledCourses: data.totalCourses || 0,
-        inProgress: data.inProgress || 0,
-        completed: data.completedCourses || 0,
-        totalHours: data.studyHours || 0
-      });
-
-      // Normalize enrolled courses for the "Continue Learning" cards
+      // normalize enrolled courses
       const payload = enrollRes?.data;
       const enrolledArray = Array.isArray(payload)
         ? payload
         : payload?.courses || payload?.myCourses || payload?.enrolled || [];
 
-      const normalized = enrolledArray.map((c) => ({
-        id: c._id || c.id,
-        title: c.title || c.name || 'Untitled Course',
-        thumbnail: c.thumbnail,
-        category: c.category || 'Course',
-        instructor: c.instructor?.name || c.instructor || '',
-        progress: typeof c.progress === 'number' ? c.progress : 0,
-        nextLesson: c.nextLesson || ''
-      }));
+      const normalized = enrolledArray.map((c) => {
+        const progress =
+          typeof c.progress === 'number'
+            ? c.progress
+            : // fallback: some backends store completed boolean
+              (c.completed ? 100 : 0);
+
+        return {
+          id: c._id || c.id,
+          title: c.title || c.name || 'Untitled Course',
+          thumbnail: c.thumbnail,
+          category: c.category || 'Course',
+          instructor: c.instructor?.name || c.instructor || '',
+          progress,
+          nextLesson: c.nextLesson || ''
+        };
+      });
 
       setCourses(normalized);
 
-      // Mocked sidebar widgets (leave as-is)
+      // === derive tiles from normalized enrollments ===
+      const enrolledCount = normalized.length;
+      const completedCount = normalized.filter(x => x.progress >= 100).length;
+      const inProgressCount = normalized.filter(x => x.progress > 0 && x.progress < 100).length;
+
+      setStats({
+        enrolledCourses: enrolledCount,
+        inProgress: inProgressCount,
+        completed: completedCount,
+        totalHours: dash.studyHours || 0
+      });
+
+      // sidebar mock data
       setUpcomingDeadlines([
         { id: 1, title: 'Next Assignment', course: 'Web Dev', daysLeft: 3, type: 'assignment' },
       ]);
-
       setRecentActivity([
         { id: 1, text: 'Logged in successfully', time: 'Just now' },
         { id: 2, text: 'Viewed Dashboard', time: 'A few seconds ago' },
       ]);
-
       setStudyStreak(5);
     } catch (err) {
       console.error('Dashboard Error:', err);
@@ -88,14 +227,14 @@ const Dashboard = () => {
     return 'Good Evening';
   };
 
-  const handleCourseClick = (courseId) => {
-    navigate(`/courses/${courseId}`);
-  };
+  const handleCourseClick = (courseId) => navigate(`/courses/${courseId}`);
+  const handleLogout = () => { logout(); navigate('/login'); };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  // tile click targets
+  const goEnrolled = () => navigate('/courses/my-courses');
+  const goInProgress = () => navigate('/courses/my-courses?tab=in-progress');
+  const goCompleted = () => navigate('/courses/my-courses?tab=completed');
+  const goStudyTime = () => navigate('/progress');
 
   if (loading) {
     return (
@@ -112,11 +251,10 @@ const Dashboard = () => {
 
   return (
     <div className="min-vh-100 bg-light">
-      {/* Top Navigation (student-only) */}
       <StudentNav />
 
       <div className="container-fluid py-4">
-        {/* Header Section */}
+        {/* Header */}
         <div className="row mb-4">
           <div className="col">
             <div className="d-flex justify-content-between align-items-center">
@@ -127,99 +265,66 @@ const Dashboard = () => {
                 <p className="text-muted mb-0">Ready to continue your learning journey today?</p>
               </div>
               <div>
-                <button className="btn btn-success me-2" onClick={() => navigate('/courses')}>
-                  Browse Courses
-                </button>
-                <button className="btn btn-outline-secondary" onClick={() => navigate('/profile')}>
-                  My Profile
-                </button>
+                <button className="btn btn-success me-2" onClick={() => navigate('/courses')}>Browse Courses</button>
+                <button className="btn btn-outline-secondary" onClick={() => navigate('/profile')}>My Profile</button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="row mb-4">
-          <div className="col-xl-3 col-md-6 mb-4">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-body">
-                <div className="d-flex align-items-center">
-                  <div className="bg-primary bg-opacity-10 rounded p-3 me-3">
-                    <i className="fas fa-book text-primary fs-4"></i>
-                  </div>
-                  <div>
-                    <h3 className="card-title mb-0">{stats.enrolledCourses}</h3>
-                    <p className="text-muted mb-0">Enrolled Courses</p>
-                  </div>
+        {/* Stats (derived + clickable) */}
+        <div className="row gy-3 mb-4">
+          <div className="col-xl-3 col-md-6">
+            <div className="card border-1 shadow-sm h-100 hover-shadow" role="button" onClick={goEnrolled}>
+              <div className="card-body d-flex align-items-center gap-3">
+                <div className="rounded-3 p-3 bg-primary bg-opacity-10">
+                  <i className="fas fa-book text-primary fs-4" />
                 </div>
-                <div className="mt-2">
-                  <small className="text-success">
-                    <i className="fas fa-arrow-up me-1"></i>
-                    +2 this month
-                  </small>
+                <div>
+                  <div className="fs-4 fw-semibold">{stats.enrolledCourses}</div>
+                  <div className="text-muted small">Enrolled Courses</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="col-xl-3 col-md-6 mb-4">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-body">
-                <div className="d-flex align-items-center">
-                  <div className="bg-warning bg-opacity-10 rounded p-3 me-3">
-                    <i className="fas fa-clock text-warning fs-4"></i>
-                  </div>
-                  <div>
-                    <h3 className="card-title mb-0">{stats.inProgress}</h3>
-                    <p className="text-muted mb-0">In Progress</p>
-                  </div>
+          <div className="col-xl-3 col-md-6">
+            <div className="card border-1 shadow-sm h-100 hover-shadow" role="button" onClick={goInProgress}>
+              <div className="card-body d-flex align-items-center gap-3">
+                <div className="rounded-3 p-3 bg-warning bg-opacity-10">
+                  <i className="fas fa-clock text-warning fs-4" />
                 </div>
-                <div className="mt-2">
-                  <small className="text-info">Active</small>
+                <div>
+                  <div className="fs-4 fw-semibold">{stats.inProgress}</div>
+                  <div className="text-muted small">In Progress</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="col-xl-3 col-md-6 mb-4">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-body">
-                <div className="d-flex align-items-center">
-                  <div className="bg-success bg-opacity-10 rounded p-3 me-3">
-                    <i className="fas fa-check-circle text-success fs-4"></i>
-                  </div>
-                  <div>
-                    <h3 className="card-title mb-0">{stats.completed}</h3>
-                    <p className="text-muted mb-0">Completed</p>
-                  </div>
+          <div className="col-xl-3 col-md-6">
+            <div className="card border-1 shadow-sm h-100 hover-shadow" role="button" onClick={goCompleted}>
+              <div className="card-body d-flex align-items-center gap-3">
+                <div className="rounded-3 p-3 bg-success bg-opacity-10">
+                  <i className="fas fa-check-circle text-success fs-4" />
                 </div>
-                <div className="mt-2">
-                  <small className="text-success">
-                    <i className="fas fa-arrow-up me-1"></i>
-                    +3 this week
-                  </small>
+                <div>
+                  <div className="fs-4 fw-semibold">{stats.completed}</div>
+                  <div className="text-muted small">Completed</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="col-xl-3 col-md-6 mb-4">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-body">
-                <div className="d-flex align-items-center">
-                  <div className="bg-info bg-opacity-10 rounded p-3 me-3">
-                    <i className="fas fa-chart-line text-info fs-4"></i>
-                  </div>
-                  <div>
-                    <h3 className="card-title mb-0">{stats.totalHours}h</h3>
-                    <p className="text-muted mb-0">Study Time</p>
-                  </div>
+          <div className="col-xl-3 col-md-6">
+            <div className="card border-1 shadow-sm h-100 hover-shadow">
+              <div className="card-body d-flex align-items-center gap-3">
+                <div className="rounded-3 p-3 bg-info bg-opacity-10">
+                  <i className="fas fa-chart-line text-info fs-4" />
                 </div>
-                <div className="mt-2">
-                  <small className="text-success">
-                    <i className="fas fa-arrow-up me-1"></i>
-                    +5h this week
-                  </small>
+                <div>
+                  <div className="fs-4 fw-semibold">{stats.totalHours}h</div>
+                  <div className="text-muted small">Study Time</div>
                 </div>
               </div>
             </div>
@@ -228,9 +333,9 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="row">
-          {/* Left Column - Main Content */}
+          {/* Left Column */}
           <div className="col-lg-8">
-            {/* Continue Learning Section */}
+            {/* Continue Learning */}
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
                 <h5 className="card-title mb-0">Continue Learning</h5>
@@ -242,7 +347,7 @@ const Dashboard = () => {
                 <div className="row">
                   {courses.length > 0 ? (
                     courses.map(course => (
-                      <div key={course.id} className="col-md-6 col-lg-4 mb-3">
+                      <div key={course.id} className="col-md-6 col-lg-6 mb-3">
                         <div
                           className="card h-100 border shadow-sm course-card"
                           onClick={() => handleCourseClick(course.id)}
@@ -273,10 +378,7 @@ const Dashboard = () => {
                                 <small>{course.progress}%</small>
                               </div>
                               <div className="progress" style={{ height: '6px' }}>
-                                <div
-                                  className="progress-bar"
-                                  style={{ width: `${course.progress}%` }}
-                                ></div>
+                                <div className="progress-bar" style={{ width: `${course.progress}%` }} />
                               </div>
                             </div>
                             <button className="btn btn-sm btn-outline-primary w-100">
@@ -304,215 +406,61 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Performance Chart Section */}
-            <div className="card border-0 shadow-sm mb-4">
-              <div className="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-                <h5 className="card-title mb-0">Weekly Progress</h5>
-                <select className="form-select form-select-sm w-auto">
-                  <option>This Week</option>
-                  <option>This Month</option>
-                  <option>This Year</option>
-                </select>
-              </div>
-              <div className="card-body">
-                <div className="d-flex align-items-end justify-content-around py-4" style={{ height: '200px' }}>
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                    <div key={day} className="text-center mx-1">
-                      <div
-                        className="bg-primary rounded mx-auto"
-                        style={{ height: `${Math.random() * 120 + 30}px`, width: '30px' }}
-                      ></div>
-                      <small className="text-muted mt-2 d-block">{day}</small>
-                    </div>
-                  ))}
-                </div>
-                <div className="text-center">
-                  <small className="text-muted">Hours studied per day</small>
-                </div>
-              </div>
-            </div>
-
-            {/* Achievements Section */}
-            <div className="card border-0 shadow-sm">
-              <div className="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-                <h5 className="card-title mb-0">Recent Achievements</h5>
-                <a href="/achievements" className="btn btn-sm btn-outline-primary">
-                  View All <i className="fas fa-arrow-right ms-1"></i>
-                </a>
-              </div>
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-md-6 col-lg-3 mb-3">
-                    <div className="text-center p-3 border rounded h-100">
-                      <div className="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                        <i className="fas fa-star text-warning fs-4"></i>
-                      </div>
-                      <h6 className="mb-1">Fast Learner</h6>
-                      <p className="small text-muted mb-0">Completed 5 courses</p>
-                    </div>
-                  </div>
-                  <div className="col-md-6 col-lg-3 mb-3">
-                    <div className="text-center p-3 border rounded h-100">
-                      <div className="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                        <i className="fas fa-fire text-success fs-4"></i>
-                      </div>
-                      <h6 className="mb-1">10-Day Streak</h6>
-                      <p className="small text-muted mb-0">Consistent learning</p>
-                    </div>
-                  </div>
-                  <div className="col-md-6 col-lg-3 mb-3">
-                    <div className="text-center p-3 border rounded h-100">
-                      <div className="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                        <i className="fas fa-trophy text-info fs-4"></i>
-                      </div>
-                      <h6 className="mb-1">Top Performer</h6>
-                      <p className="small text-muted mb-0">95% average score</p>
-                    </div>
-                  </div>
-                  <div className="col-md-6 col-lg-3 mb-3">
-                    <div className="text-center p-3 border rounded h-100 opacity-50">
-                      <div className="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                        <i className="fas fa-lock text-secondary fs-4"></i>
-                      </div>
-                      <h6 className="mb-1">Course Master</h6>
-                      <p className="small text-muted mb-0">Complete 10 courses</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Calendar */}
+            <CalendarBlock />
           </div>
 
           {/* Right Sidebar */}
-          <div className="col-lg-4">
-            {/* Study Streak Widget */}
-            <div className="card border-0 shadow-sm mb-4">
-              <div className="card-body text-center">
-                <h5 className="card-title">Study Streak</h5>
-                <div className="my-4">
-                  <div className="bg-warning rounded-circle d-inline-flex flex-column align-items-center justify-content-center text-white" style={{ width: '100px', height: '100px' }}>
-                    <span className="h3 mb-0">{studyStreak}</span>
-                    <small>days</small>
-                  </div>
+          <div className="col-xl-3 col-lg-4 col-md-5 col-12 ms-auto mt-5">
+                {/* Upcoming Deadlines */}
+                <div className="card border-2 shadow-sm mb-4" style={{ maxWidth: 360, marginLeft: 'auto' }}>
+                    <div className="card-header bg-white border-0 py-2">
+                    <h5 className="card-title mb-1">Upcoming Deadlines</h5>
+                    </div>
+                    <div className="card-body p-0">
+                    <ul className="list-group list-group-flush">
+                        {upcomingDeadlines.map(deadline => (
+                        <li key={deadline.id} className="list-group-item py-2">
+                            <div className="d-flex justify-content-between align-items-start">
+                            <div className="flex-grow-1 pe-2">
+                                <span className="badge bg-primary me-2 text-capitalize">{deadline.type}</span>
+                                <h6 className="mb-1">{deadline.title}</h6>
+                                <small className="text-muted">{deadline.course}</small>
+                            </div>
+                            <span className={`badge ${deadline.daysLeft <= 3 ? 'bg-danger' : 'bg-warning'}`}>
+                                {deadline.daysLeft}d
+                            </span>
+                            </div>
+                        </li>
+                        ))}
+                    </ul>
+                    </div>
                 </div>
-                <p className="text-success mb-3">
-                  <i className="fas fa-fire me-1"></i>
-                  Amazing! Keep it up!
-                </p>
-                <div className="d-flex justify-content-center">
-                  {[...Array(7)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={`rounded-circle mx-1 ${i < studyStreak % 7 ? 'bg-warning' : 'bg-light'}`}
-                      style={{ width: '12px', height: '12px' }}
-                    ></div>
-                  ))}
+
+                {/* Recent Activity */}
+                <div className="card border-2 shadow-sm mb-5" style={{ maxWidth: 360, marginLeft: 'auto' }}>
+                    <div className="card-header bg-white border-0 py-2">
+                    <h5 className="card-title mb-0">Recent Activity</h5>
+                    </div>
+                    <div className="card-body p-0">
+                    <ul className="list-group list-group-flush">
+                        {recentActivity.map(activity => (
+                        <li key={activity.id} className="list-group-item py-2">
+                            <div className="d-flex">
+                            <div className="flex-shrink-0 me-3">
+                                <span className="fs-6">{activity.icon}</span>
+                            </div>
+                            <div className="flex-grow-1">
+                                <p className="mb-1 small">{activity.text}</p>
+                                <small className="text-muted">{activity.time}</small>
+                            </div>
+                            </div>
+                        </li>
+                        ))}
+                    </ul>
+                    </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Upcoming Deadlines */}
-            <div className="card border-0 shadow-sm mb-4">
-              <div className="card-header bg-white border-0 py-3">
-                <h5 className="card-title mb-0">Upcoming Deadlines</h5>
-              </div>
-              <div className="card-body p-0">
-                <ul className="list-group list-group-flush">
-                  {upcomingDeadlines.map(deadline => (
-                    <li key={deadline.id} className="list-group-item">
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div className="flex-grow-1">
-                          <span className="badge bg-primary me-2 text-capitalize">{deadline.type}</span>
-                          <h6 className="mb-1">{deadline.title}</h6>
-                          <small className="text-muted">{deadline.course}</small>
-                        </div>
-                        <span className={`badge ${deadline.daysLeft <= 3 ? 'bg-danger' : 'bg-warning'}`}>
-                          {deadline.daysLeft}d
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="card-footer bg-white border-0">
-                <button className="btn btn-outline-primary w-100">
-                  View Calendar
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="card border-0 shadow-sm mb-4">
-              <div className="card-header bg-white border-0 py-3">
-                <h5 className="card-title mb-0">Recent Activity</h5>
-              </div>
-              <div className="card-body p-0">
-                <ul className="list-group list-group-flush">
-                  {recentActivity.map(activity => (
-                    <li key={activity.id} className="list-group-item">
-                      <div className="d-flex">
-                        <div className="flex-shrink-0 me-3">
-                          <span className="fs-5">{activity.icon}</span>
-                        </div>
-                        <div className="flex-grow-1">
-                          <p className="mb-1">{activity.text}</p>
-                          <small className="text-muted">{activity.time}</small>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="card border-0 shadow-sm mb-4">
-              <div className="card-header bg-white border-0 py-3">
-                <h5 className="card-title mb-0">Quick Actions</h5>
-              </div>
-              <div className="card-body">
-                <div className="row g-2">
-                  <div className="col-6">
-                    <button className="btn btn-outline-secondary w-100" onClick={() => navigate('/notes')}>
-                      <i className="fas fa-sticky-note me-2"></i>
-                      My Notes
-                    </button>
-                  </div>
-                  <div className="col-6">
-                    <button className="btn btn-outline-secondary w-100" onClick={() => navigate('/forum')}>
-                      <i className="fas fa-comments me-2"></i>
-                      Forum
-                    </button>
-                  </div>
-                  <div className="col-6">
-                    <button className="btn btn-outline-secondary w-100" onClick={() => navigate('/tutors')}>
-                      <i className="fas fa-chalkboard-teacher me-2"></i>
-                      Find Tutor
-                    </button>
-                  </div>
-                  <div className="col-6">
-                    <button className="btn btn-outline-secondary w-100" onClick={() => navigate('/progress')}>
-                      <i className="fas fa-chart-bar me-2"></i>
-                      Progress
-                    </button>
-                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Study Tips */}
-            <div className="card border-0 shadow-sm bg-light">
-              <div className="card-body">
-                <h5 className="card-title">
-                  <i className="fas fa-lightbulb text-warning me-2"></i>
-                  Today's Tip
-                </h5>
-                <p className="card-text">
-                  "Take regular breaks using the Pomodoro Technique: 25 minutes of focused study, followed by a 5-minute break."
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
