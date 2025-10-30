@@ -103,9 +103,7 @@ setStats({
                                 <p className="text-muted mb-0">Ready to continue your learning journey today?</p>
                             </div>
                             <div>
-                                <button className="btn btn-success me-2" onClick={() => navigate('/courses')}>
-                                    Browse Courses
-                                </button>
+                               
                                 <button className="btn btn-outline-secondary" onClick={() => navigate('/profile')}>
                                     My Profile
                                 </button>

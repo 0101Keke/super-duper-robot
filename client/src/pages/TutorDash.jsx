@@ -44,6 +44,9 @@ function TutorDash() {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="fw-bold">Tutor Dashboard</h1>
           <button className="btn btn-dark">+ New Course</button>
+           <button className="btn btn-success me-2" onClick={() => navigate('/courses')}>
+                                    Browse Courses
+                                </button>
         </div>
 
         {/* DASHBOARD STATS */}
