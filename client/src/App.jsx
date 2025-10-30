@@ -28,6 +28,7 @@ import MyCourses from './pages/MyCourses.jsx';
 import Assignments from './pages/Assignments.jsx'
 import StudentSubmissions from './pages/StudentSubmissions.jsx';
 import ManageTutors from './pages/ManageTutors';// create if missing
+import TutorResources from "./pages/TutorResources.jsx"; 
 
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
             <Route path="/courses/:courseId/assignments" element={<Assignments />} />
             <Route path="/student/my-submissions" element={<StudentSubmissions />} />
             <Route path='/admin/manage-tutors' element={<ManageTutors />} />
+            <Route path="/tutor-resources" element={<TutorResources />} />
         </Routes>
     );
 }

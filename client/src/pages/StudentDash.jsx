@@ -114,6 +114,15 @@ const Dashboard = () => {
     <div className="min-vh-100 bg-light">
       {/* Top Navigation (student-only) */}
       <StudentNav />
+      <div className="col-6">
+  <button
+    className="btn btn-outline-secondary w-100"
+    onClick={() => navigate('/course-resources')}
+  >
+    <i className="fas fa-folder-open me-2"></i>
+    Resources
+  </button>
+</div>
 
       <div className="container-fluid py-4">
         {/* Header Section */}

@@ -1,83 +1,96 @@
-import { useState } from "react";
-import axios from "axios";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 function TutorResources() {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    file: null
-  });
-  const [message, setMessage] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [file, setFile] = useState(null);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    if (e.target.type === "file") {
-      setFormData({ ...formData, file: e.target.files[0] });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
-  };
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/courses/my', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCourses(res.data || []);
+      } catch (err) {
+        console.error('Error fetching courses:', err);
+      }
+    };
+    fetchCourses();
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedCourse || !file) return setMessage('Please select a course and file.');
 
-    const token = localStorage.getItem("token");
-    const data = new FormData();
-    data.append("title", formData.title);
-    data.append("description", formData.description);
-    data.append("file", formData.file);
+    const formData = new FormData();
+    formData.append('file', file);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/resources/upload", data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setMessage("✅ Resource uploaded successfully!");
-      setFormData({ title: "", description: "", file: null });
+      setLoading(true);
+      const res = await axios.post(
+        `http://localhost:5000/api/resources/upload/${selectedCourse}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      setMessage('✅ Upload successful!');
+      setFile(null);
     } catch (err) {
-      setMessage("❌ Upload failed. " + (err.response?.data?.message || ""));
+      console.error(err);
+      setMessage('❌ Upload failed.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div className="min-vh-100 d-flex flex-column">
       <Header />
-      <div className="container my-5" style={{ maxWidth: "600px" }}>
-        <h2 className="text-center mb-4">Upload a New Resource</h2>
+      <div className="container my-5 flex-grow-1" style={{ maxWidth: '600px' }}>
+        <h2 className="text-center mb-4">Upload Course Resource</h2>
+
         {message && <div className="alert alert-info">{message}</div>}
+
         <form onSubmit={handleSubmit}>
-          <label className="form-label fw-bold">Title</label>
-          <input
-            type="text"
-            name="title"
-            className="form-control mb-3"
-            value={formData.title}
-            onChange={handleChange}
+          <label className="form-label fw-bold">Select Course</label>
+          <select
+            className="form-select mb-3"
+            value={selectedCourse}
+            onChange={(e) => setSelectedCourse(e.target.value)}
             required
-          />
+          >
+            <option value="">-- Choose a Course --</option>
+            {courses.map((c) => (
+              <option key={c._id} value={c._id}>
+                {c.title}
+              </option>
+            ))}
+          </select>
 
-          <label className="form-label fw-bold">Description</label>
-          <textarea
-            name="description"
-            className="form-control mb-3"
-            value={formData.description}
-            onChange={handleChange}
-          />
-
-          <label className="form-label fw-bold">Select File</label>
+          <label className="form-label fw-bold">Choose File</label>
           <input
             type="file"
-            name="file"
             className="form-control mb-3"
-            onChange={handleChange}
+            onChange={(e) => setFile(e.target.files[0])}
             required
           />
 
-          <button type="submit" className="btn btn-dark w-100">
-            Upload Resource
+          <button type="submit" className="btn btn-dark w-100" disabled={loading}>
+            {loading ? 'Uploading...' : 'Upload Resource'}
           </button>
         </form>
       </div>

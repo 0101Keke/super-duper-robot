@@ -1,45 +1,48 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import StudentNav from '../Components/StudentNav.jsx';
+import Footer from '../components/Footer.jsx';
 
 function StudentResources() {
+  const { courseId } = useParams();
   const [resources, setResources] = useState([]);
+  const [courseTitle, setCourseTitle] = useState('');
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchResources = async () => {
-      const token = localStorage.getItem("token");
       try {
-        const res = await axios.get("http://localhost:5000/api/resources", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.get(`http://localhost:5000/api/resources/${courseId}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        setResources(res.data);
+        setResources(res.data.resources || []);
+        setCourseTitle(res.data.courseTitle || 'Course');
       } catch (err) {
-        console.error("Error fetching resources:", err);
+        console.error('Error fetching resources:', err);
       }
     };
     fetchResources();
-  }, []);
+  }, [courseId, token]);
 
   return (
-    <div>
-      <Header />
-      <div className="container my-5">
-        <h2 className="text-center mb-4">Available Resources</h2>
+    <div className="min-vh-100 d-flex flex-column bg-light">
+      <StudentNav />
+      <div className="container py-5 flex-grow-1">
+        <h2 className="mb-4 text-center">{courseTitle} Resources</h2>
         <div className="row g-3">
-          {resources.map((r) => (
-            <div key={r._id} className="col-md-4">
-              <div className="card shadow-sm border-0">
-                <div className="card-body">
-                  <h5>{r.title}</h5>
-                  <p className="text-muted small">{r.description}</p>
-                  <p className="small text-secondary">
-                    Uploaded by: {r.uploadedBy?.fullName || "Unknown"}
-                  </p>
+          {resources.map((r, index) => (
+            <div key={index} className="col-md-4">
+              <div className="card shadow-sm border-0 h-100">
+                <div className="card-body text-center">
+                  <i className="fas fa-file-alt fa-2x text-primary mb-3"></i>
+                  <h6 className="fw-semibold">{r.name}</h6>
+                  <p className="text-muted small">{r.type}</p>
                   <a
-                    href={`http://localhost:5000${r.fileUrl}`}
-                    download
-                    className="btn btn-outline-dark btn-sm"
+                    href={`http://localhost:5000${r.url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline-dark btn-sm mt-2"
                   >
                     Download
                   </a>
@@ -47,7 +50,13 @@ function StudentResources() {
               </div>
             </div>
           ))}
-          {resources.length === 0 && <p>No resources available.</p>}
+
+          {resources.length === 0 && (
+            <div className="text-center py-5 text-muted">
+              <i className="fas fa-folder-open fa-3x mb-3"></i>
+              <p>No resources uploaded yet for this course.</p>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
