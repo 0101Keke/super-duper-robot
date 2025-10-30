@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import Header from '../components/Header.jsx';
-import Footer from '../components/Footer.jsx';
+import Header from '../Components/StudentNav.jsx';
+import Footer from '../Components/Footer.jsx';
 import API from '../api';
 
 function Assignments() {
